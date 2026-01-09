@@ -1,16 +1,14 @@
 package pl.blillcalculator.bartek.gui;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 
 public class BillCalculator extends JFrame{
     private JPanel mainPanel;
     private JLabel titleLabel;
     private JTextField billTextField;
     private JLabel billLabel;
-    private JComboBox sortByPercentComboBox;
+    private JComboBox tipPercentComboBox;
     private JButton calculateBillButton;
     private JLabel tipLabel;
     private JTextField tipTextField;
@@ -27,6 +25,16 @@ public class BillCalculator extends JFrame{
         setContentPane(mainPanel);
 
         createListeners();
+        setTextFieldsVisibility();
+
+        tipPercentComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    calculateBill();
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {
@@ -47,8 +55,8 @@ public class BillCalculator extends JFrame{
     }
 
     private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
+
     private void createListeners() {
         billTextField.addKeyListener(new KeyAdapter() {
             @Override
@@ -59,16 +67,33 @@ public class BillCalculator extends JFrame{
                 }
             }
         });
+        calculateBillButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                calculateBill();
+            }
+        });
 
     }
     private void calculateBill() {
         double bill = 0;
         try {
             bill = Double.parseDouble(billTextField.getText());
+            String tipPercent = (String) tipPercentComboBox.getSelectedItem();
+            tipPercent = tipPercent.replaceAll("%", "");
+            int iTipPercent = Integer.valueOf(tipPercent);
+            System.out.println("Kwota racunku = " + bill + " procent napiwku = " + iTipPercent);
+//            todo - wykonać obliczenia kwoty napiwu, oraz ostatecznej kwoty rachunku i wyświetlić w textFieldach
             warningLabel.setText("");
         } catch (NumberFormatException e) {
-            warningLabel.setText(("Wpisano błędną kwotę!"));
+            warningLabel.setText(("Wpisano błędne znaki!"));
+//            todo - zmienić kolor błędu powyżej na czerwony (warningLabel)
         }
+    }
+
+    private void setTextFieldsVisibility(){
+        tipTextField.setEnabled(false);
+        billSumTextField.setEnabled(false);
     }
 
 }

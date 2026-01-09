@@ -56,7 +56,7 @@
           <text value="Napiwek: "/>
         </properties>
       </component>
-      <component id="77e6e" class="javax.swing.JComboBox" binding="sortByPercentComboBox">
+      <component id="77e6e" class="javax.swing.JComboBox" binding="tipPercentComboBox">
         <constraints>
           <grid row="4" column="0" row-span="2" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="100" height="25"/>
@@ -65,7 +65,7 @@
         </constraints>
         <properties>
           <model>
-            <item value=" 5%"/>
+            <item value="5%"/>
             <item value="10%"/>
             <item value="15%"/>
             <item value="20%"/>
