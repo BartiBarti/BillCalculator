@@ -1,6 +1,7 @@
 package pl.blillcalculator.bartek.gui;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class BillCalculator extends JFrame{
@@ -82,12 +83,21 @@ public class BillCalculator extends JFrame{
             String tipPercent = (String) tipPercentComboBox.getSelectedItem();
             tipPercent = tipPercent.replaceAll("%", "");
             int iTipPercent = Integer.valueOf(tipPercent);
-            System.out.println("Kwota racunku = " + bill + " procent napiwku = " + iTipPercent);
-//            todo - wykonać obliczenia kwoty napiwu, oraz ostatecznej kwoty rachunku i wyświetlić w textFieldach
+
+            double tip = bill * iTipPercent/100;
+            double fullBill = tip + bill;
+            String sTip = String.format("%.2f", tip);
+            String sFullBill = String.format("%.2f", fullBill);
+            tipTextField.setText(sTip);
+            billSumTextField.setText(sFullBill);
             warningLabel.setText("");
         } catch (NumberFormatException e) {
+//              Działają dwie metody ta przy użyciu HTMLa też, tylko jest zakomentowana
+//            warningLabel.setText("<html><font color='red'>Wpisano błędne znaki!</font></html>");
             warningLabel.setText(("Wpisano błędne znaki!"));
-//            todo - zmienić kolor błędu powyżej na czerwony (warningLabel)
+            warningLabel.setForeground(Color.RED);
+            tipTextField.setText("");
+//
         }
     }
 
