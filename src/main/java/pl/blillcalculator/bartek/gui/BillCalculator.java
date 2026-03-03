@@ -4,22 +4,65 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class BillCalculator extends JFrame{
+
+public class BillCalculator extends JFrame {
     private JPanel mainPanel;
     private JLabel titleLabel;
     private JTextField billTextField;
     private JLabel billLabel;
     private JComboBox tipPercentComboBox;
-    private JButton calculateBillButton;
+    //    private JButton calculateBillButton;
     private JLabel tipLabel;
     private JTextField tipTextField;
     private JLabel billSumLabel;
     private JTextField billSumTextField;
     private JLabel warningLabel;
 
+    private JCheckBox tomatoSoupCheckArea;
+    private JCheckBox sourSoupCheckBox;
+    private JLabel tipPercentLabel;
+    private JLabel soubsLabel;
+    private JCheckBox mushroomSoupCheckBox;
+    private JLabel mainCourseLabel;
+    private JCheckBox porkChopCheckBox;
+    private JCheckBox chickenSteakJCheckBox;
+    private JCheckBox salmonCheckBox;
+    private JLabel desertsLabel;
+    private JCheckBox applePieCheckBox;
+    private JCheckBox tortCheckBox;
+    private JCheckBox cheeseCakeCheckBox;
+    private JLabel drinksLabel;
+    private JCheckBox coffeeCheckBox;
+    private JCheckBox teaCheckBox;
+    private JCheckBox lemonadeCheckBox;
+    private JCheckBox compoteCheckBox;
+    private JCheckBox beerCheckBox;
+    private JCheckBox wineCheckBox;
+    private JLabel tomatoSoupLabel;
+    private JLabel sourSoupLabel;
+    private JLabel mushroomSoupLabel;
+    private JLabel porkChopLabel;
+    private JLabel chickenSteakLabel;
+    private JLabel salmonLabel;
+    private JLabel applePielabel;
+    private JLabel tortLabel;
+    private JLabel cheeseCakeLabel;
+    private JLabel coffeeLabel;
+    private JLabel teaLabel;
+    private JLabel lemonadeLabel;
+    private JLabel compoteLabel;
+    private JLabel beerLabel;
+    private JLabel wineLabel;
+    private JLabel additionalsLabel;
+    private JCheckBox potatoCheckBox;
+    private JLabel potatoLabel;
+    private JButton additionalsButton;
+
+    private static BillCalculator billCalculator = new BillCalculator();
+
     public BillCalculator() {
         setTitle("Bill Calculator");
-        setSize(420, 340);
+        setSize(1000, 840);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 //        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); - granica i margines dodana w pliku .form w ustawieniach
@@ -27,7 +70,8 @@ public class BillCalculator extends JFrame{
 
         createListeners();
         setTextFieldsVisibility();
-
+// Todo uzupełnic dodatki oraz surówki napoje zimne i ciepłe podzielić po 3 plus ItemListenery do checkboxów przenieść napoje na druga kolumnę
+//        Wyszarzyć pole z kwotą rachunku
         tipPercentComboBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -36,10 +80,140 @@ public class BillCalculator extends JFrame{
                 }
             }
         });
+
+        tomatoSoupCheckArea.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, tomatoSoupLabel);
+                calculateBill();
+            }
+        });
+        sourSoupCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, sourSoupLabel);
+                calculateBill();
+            }
+        });
+        mushroomSoupCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, mushroomSoupLabel);
+                calculateBill();
+            }
+        });
+        porkChopCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, porkChopLabel);
+                calculateBill();
+            }
+        });
+        chickenSteakJCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, chickenSteakLabel);
+                calculateBill();
+            }
+        });
+        salmonCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, salmonLabel);
+                calculateBill();
+            }
+        });
+        applePieCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, applePielabel);
+                calculateBill();
+            }
+        });
+        tortCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, tortLabel);
+                calculateBill();
+            }
+        });
+        cheeseCakeCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, cheeseCakeLabel);
+                calculateBill();
+            }
+        });
+        coffeeCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, coffeeLabel);
+                calculateBill();
+            }
+        });
+        teaCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, teaLabel);
+                calculateBill();
+            }
+        });
+        lemonadeCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, lemonadeLabel);
+                calculateBill();
+            }
+        });
+        compoteCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, compoteLabel);
+                calculateBill();
+            }
+        });
+        beerCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, beerLabel);
+                calculateBill();
+            }
+        });
+        wineCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                calculateNewBillAmount(e, wineLabel);
+                calculateBill();
+            }
+        });
+        additionalsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> new Menu(billTextField,
+                        "src/main/resources/Apetizers.txt",
+                        billCalculator).setVisible(true));
+            }
+        });
+    }
+
+    private void calculateNewBillAmount(ItemEvent e, JLabel label) {
+        String sDinnerPrice = label.getText();
+        Double dDinnerPrice = Double.valueOf(sDinnerPrice);
+        String sBillAmount = billTextField.getText();
+        Double dBillAmount = 0.0;
+        if (sBillAmount != null && !sBillAmount.equals("")) {
+            dBillAmount = Double.valueOf(sBillAmount);
+        }
+        if (ItemEvent.SELECTED == e.getStateChange()) {
+            dBillAmount = dBillAmount + dDinnerPrice;
+        } else {
+            dBillAmount = dBillAmount - dDinnerPrice;
+        }
+        billTextField.setText(String.valueOf(dBillAmount));
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new BillCalculator().setVisible(true));
+        SwingUtilities.invokeLater(() -> billCalculator.setVisible(true));
 
 //        List<String> list = null;
 
@@ -68,15 +242,16 @@ public class BillCalculator extends JFrame{
                 }
             }
         });
-        calculateBillButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                calculateBill();
-            }
-        });
+//        calculateBillButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                calculateBill();
+//            }
+//        });
 
     }
-    private void calculateBill() {
+
+    public void calculateBill() {
         double bill = 0;
         try {
             bill = Double.parseDouble(billTextField.getText());
@@ -84,7 +259,7 @@ public class BillCalculator extends JFrame{
             tipPercent = tipPercent.replaceAll("%", "");
             int iTipPercent = Integer.valueOf(tipPercent);
 
-            double tip = bill * iTipPercent/100;
+            double tip = bill * iTipPercent / 100;
             double fullBill = tip + bill;
             String sTip = String.format("%.2f", tip);
             String sFullBill = String.format("%.2f", fullBill);
@@ -101,9 +276,11 @@ public class BillCalculator extends JFrame{
         }
     }
 
-    private void setTextFieldsVisibility(){
+
+    private void setTextFieldsVisibility() {
         tipTextField.setEnabled(false);
         billSumTextField.setEnabled(false);
+        billTextField.setEnabled(false);
     }
 
 }
