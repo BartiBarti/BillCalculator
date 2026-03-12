@@ -17,11 +17,7 @@ public class BillCalculator extends JFrame {
     private JLabel billSumLabel;
     private JTextField billSumTextField;
     private JLabel warningLabel;
-
-    private JCheckBox tomatoSoupCheckArea;
-    private JCheckBox sourSoupCheckBox;
     private JLabel tipPercentLabel;
-    private JCheckBox mushroomSoupCheckBox;
     private JLabel mainCourseLabel;
     private JCheckBox porkChopCheckBox;
     private JCheckBox chickenSteakJCheckBox;
@@ -37,9 +33,6 @@ public class BillCalculator extends JFrame {
     private JCheckBox compoteCheckBox;
     private JCheckBox beerCheckBox;
     private JCheckBox wineCheckBox;
-    private JLabel tomatoSoupLabel;
-    private JLabel sourSoupLabel;
-    private JLabel mushroomSoupLabel;
     private JLabel porkChopLabel;
     private JLabel chickenSteakLabel;
     private JLabel salmonLabel;
@@ -78,28 +71,7 @@ public class BillCalculator extends JFrame {
                 }
             }
         });
-
-        tomatoSoupCheckArea.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                calculateNewBillAmount(e, tomatoSoupLabel);
-                calculateBill();
-            }
-        });
-        sourSoupCheckBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                calculateNewBillAmount(e, sourSoupLabel);
-                calculateBill();
-            }
-        });
-        mushroomSoupCheckBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                calculateNewBillAmount(e, mushroomSoupLabel);
-                calculateBill();
-            }
-        });
+        
         porkChopCheckBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
