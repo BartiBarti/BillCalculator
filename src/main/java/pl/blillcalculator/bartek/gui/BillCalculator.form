@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="pl.blillcalculator.bartek.gui.BillCalculator">
-  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="27" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="27" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
       <xy x="18" y="21" width="657" height="913"/>
@@ -12,7 +12,7 @@
     <children>
       <component id="9424e" class="javax.swing.JLabel" binding="titleLabel">
         <constraints>
-          <grid row="2" column="4" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="2" column="2" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <font size="24" style="1"/>
@@ -21,7 +21,7 @@
       </component>
       <component id="de707" class="javax.swing.JLabel" binding="warningLabel">
         <constraints>
-          <grid row="26" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="26" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <font size="16" style="1"/>
@@ -42,15 +42,6 @@
         </constraints>
         <properties>
           <text value="Żurek"/>
-        </properties>
-      </component>
-      <component id="8e6c7" class="javax.swing.JLabel" binding="soubsLabel">
-        <constraints>
-          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <font size="16"/>
-          <text value="Zupy"/>
         </properties>
       </component>
       <component id="7eacb" class="javax.swing.JCheckBox" binding="mushroomSoupCheckBox">
@@ -152,7 +143,7 @@
       </component>
       <component id="f811f" class="javax.swing.JLabel" binding="billSumLabel">
         <constraints>
-          <grid row="17" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="17" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <font size="14" style="1"/>
@@ -161,7 +152,7 @@
       </component>
       <component id="f093e" class="javax.swing.JTextField" binding="billSumTextField">
         <constraints>
-          <grid row="17" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="17" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
@@ -222,7 +213,7 @@
       </component>
       <component id="4f272" class="javax.swing.JLabel" binding="billLabel">
         <constraints>
-          <grid row="3" column="4" row-span="5" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="2" row-span="5" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <font size="14" style="1"/>
@@ -231,7 +222,7 @@
       </component>
       <component id="57ed3" class="javax.swing.JTextField" binding="billTextField">
         <constraints>
-          <grid row="5" column="5" row-span="2" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="5" column="3" row-span="2" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
@@ -239,7 +230,7 @@
       </component>
       <component id="d9de0" class="javax.swing.JLabel" binding="tipLabel">
         <constraints>
-          <grid row="13" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="13" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <font size="14" style="1"/>
@@ -248,7 +239,7 @@
       </component>
       <component id="1dea4" class="javax.swing.JTextField" binding="tipTextField">
         <constraints>
-          <grid row="13" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="13" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="150" height="-1"/>
           </grid>
         </constraints>
@@ -261,7 +252,7 @@
       </hspacer>
       <component id="be6b9" class="javax.swing.JLabel" binding="tipPercentLabel">
         <constraints>
-          <grid row="8" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+          <grid row="8" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <font size="14" style="1"/>
@@ -270,7 +261,7 @@
       </component>
       <component id="77e6e" class="javax.swing.JComboBox" binding="tipPercentComboBox">
         <constraints>
-          <grid row="8" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
+          <grid row="8" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="100" height="25"/>
             <maximum-size width="100" height="25"/>
           </grid>
@@ -404,42 +395,29 @@
           <text value="16"/>
         </properties>
       </component>
-      <component id="72601" class="javax.swing.JLabel" binding="additionalsLabel">
-        <constraints>
-          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <font size="16"/>
-          <text value="Dodatki"/>
-        </properties>
-      </component>
-      <hspacer id="db7b6">
-        <constraints>
-          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-      </hspacer>
-      <component id="d2f9" class="javax.swing.JCheckBox" binding="potatoCheckBox">
-        <constraints>
-          <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Ziemniaki"/>
-        </properties>
-      </component>
-      <component id="bfb85" class="javax.swing.JLabel" binding="potatoLabel">
-        <constraints>
-          <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="9"/>
-        </properties>
-      </component>
       <component id="56c9c" class="javax.swing.JButton" binding="additionalsButton">
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Przystawki"/>
+        </properties>
+      </component>
+      <component id="3f137" class="javax.swing.JLabel" binding="menuLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font size="24" style="1"/>
+          <text value="Menu"/>
+        </properties>
+      </component>
+      <component id="d371c" class="javax.swing.JButton" binding="soupsButton">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Zupy"/>
         </properties>
       </component>
     </children>

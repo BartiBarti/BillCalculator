@@ -21,7 +21,6 @@ public class BillCalculator extends JFrame {
     private JCheckBox tomatoSoupCheckArea;
     private JCheckBox sourSoupCheckBox;
     private JLabel tipPercentLabel;
-    private JLabel soubsLabel;
     private JCheckBox mushroomSoupCheckBox;
     private JLabel mainCourseLabel;
     private JCheckBox porkChopCheckBox;
@@ -53,10 +52,9 @@ public class BillCalculator extends JFrame {
     private JLabel compoteLabel;
     private JLabel beerLabel;
     private JLabel wineLabel;
-    private JLabel additionalsLabel;
-    private JCheckBox potatoCheckBox;
-    private JLabel potatoLabel;
     private JButton additionalsButton;
+    private JButton soupsButton;
+    private JLabel menuLabel;
 
     private static BillCalculator billCalculator = new BillCalculator();
 
@@ -191,6 +189,14 @@ public class BillCalculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/Apetizers.txt",
+                        billCalculator).setVisible(true));
+            }
+        });
+        soupsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() ->new Menu(billTextField,
+                        "src/main/resources/Soups.txt",
                         billCalculator).setVisible(true));
             }
         });

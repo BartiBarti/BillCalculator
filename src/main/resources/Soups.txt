@@ -1,0 +1,3 @@
+Zupa pomidorowa;12
+Żurek;14
+Grzybowa;11
