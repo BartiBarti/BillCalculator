@@ -1,0 +1,6 @@
+Kawa;12
+Herbata;8
+Lemoniada;11
+Kompot;6
+Piwo;15
+Wino;16

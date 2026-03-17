@@ -1,0 +1,4 @@
+Ziemniaki;15
+Makaron;14
+Ryż;19
+Kasza;21

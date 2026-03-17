@@ -1,0 +1,3 @@
+Szarlotka;10
+Tort;15
+Sernik;9
