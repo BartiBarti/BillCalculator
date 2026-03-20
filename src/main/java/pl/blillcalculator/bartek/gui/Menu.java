@@ -16,8 +16,11 @@ public class Menu extends JFrame {
     private double total;
 
     public Menu(JTextField amountField, String filePath, BillCalculator billCalculator) {
+//        todo tytuł przekazać w parametrze konstruktora, tak aby gdy klikniemy przycisk z
+//         przystawkami, żeby pojawił się Tytuł "przystawki", a jak napoje to "napoje"
+//         itd
         setTitle("Menu");
-        setSize(600, 300);
+        setSize(300, 200);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         menuPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
