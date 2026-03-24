@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class BillCalculator extends JFrame {
@@ -29,6 +31,8 @@ public class BillCalculator extends JFrame {
     private JButton additionalsButton;
 
     private static BillCalculator billCalculator = new BillCalculator();
+
+    private Map<MenuItem, Integer> choosenDinners = new HashMap<>();
 
     public BillCalculator() {
         setTitle("Bill Calculator");
@@ -77,7 +81,8 @@ public class BillCalculator extends JFrame {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/Apetizers.txt",
                         billCalculator,
-                        "Przystawki").setVisible(true));
+                        "Przystawki",
+                        choosenDinners).setVisible(true));
             }
         });
         soupsButton.addActionListener(new ActionListener() {
@@ -86,7 +91,8 @@ public class BillCalculator extends JFrame {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/Soups.txt",
                         billCalculator,
-                        "Zupy").setVisible(true));
+                        "Zupy",
+                        choosenDinners).setVisible(true));
             }
         });
         mainDishesButton.addActionListener(new ActionListener() {
@@ -95,7 +101,8 @@ public class BillCalculator extends JFrame {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/MainDishes.txt",
                         billCalculator,
-                        "Danie główne").setVisible(true));
+                        "Danie główne",
+                        choosenDinners).setVisible(true));
             }
         });
         additionalsButton.addActionListener(new ActionListener() {
@@ -104,7 +111,8 @@ public class BillCalculator extends JFrame {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/Additionals.txt",
                         billCalculator,
-                        "Dodatki").setVisible(true));
+                        "Dodatki",
+                        choosenDinners).setVisible(true));
 
             }
         });
@@ -114,7 +122,8 @@ public class BillCalculator extends JFrame {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/Deserts.txt",
                         billCalculator,
-                        "Desery").setVisible(true));
+                        "Desery",
+                        choosenDinners).setVisible(true));
             }
         });
         drinksButton.addActionListener(new ActionListener() {
@@ -123,7 +132,8 @@ public class BillCalculator extends JFrame {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/Drinks.txt",
                         billCalculator,
-                        "Napoje").setVisible(true));
+                        "Napoje",
+                        choosenDinners).setVisible(true));
             }
         });
     }

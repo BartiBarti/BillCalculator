@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Menu extends JFrame {
     private JPanel menuPanel;
@@ -15,18 +16,17 @@ public class Menu extends JFrame {
 
     private double total;
 
-    public Menu(JTextField amountField, String filePath, BillCalculator billCalculator, String title) {
-//        todo tytuł przekazać w parametrze konstruktora, tak aby gdy klikniemy przycisk z
-//         przystawkami, żeby pojawił się Tytuł "przystawki", a jak napoje to "napoje"
-//         itd
-//        setTitle("Menu");
-            setTitle(title);
+    private Map<MenuItem, Integer> choosenDinners;
+
+    public Menu(JTextField amountField, String filePath, BillCalculator billCalculator, String title, Map<MenuItem, Integer> choosenDinners) {
+        setTitle(title);
         setSize(300, 200);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         menuPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.amountField = amountField;
         this.total = !"".equals(amountField.getText()) ? Double.parseDouble(amountField.getText()) : 0.0;
+        this.choosenDinners = choosenDinners;
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         setContentPane(menuPanel);
 
@@ -44,12 +44,17 @@ public class Menu extends JFrame {
             JCheckBox checkBox = new JCheckBox(
                     item.getName() + " - " + item.getPrice() + " zł"
             );
-
+            final Integer menuItemCount = choosenDinners.get(item) != null ? choosenDinners.get(item) : 0;
+            if (menuItemCount == 1){
+                checkBox.setSelected(true);
+            }
             checkBox.addItemListener(e -> {
                 if (checkBox.isSelected()) {
                     total += item.getPrice();
+                    choosenDinners.put(item, menuItemCount+1);
                 } else {
                     total -= item.getPrice();
+                    choosenDinners.put(item, menuItemCount-1);
                 }
                 String amount = String.format("%.2f", total).replaceFirst(",", ".");
                 amountField.setText(amount);
