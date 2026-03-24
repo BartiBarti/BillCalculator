@@ -42,6 +42,7 @@ public class BillCalculator extends JFrame {
         setTextFieldEditability();
 
         menuActionListeners();
+
     }
 
     public void calculateBill() {
@@ -75,7 +76,8 @@ public class BillCalculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/Apetizers.txt",
-                        billCalculator).setVisible(true));
+                        billCalculator,
+                        "Przystawki").setVisible(true));
             }
         });
         soupsButton.addActionListener(new ActionListener() {
@@ -83,7 +85,8 @@ public class BillCalculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/Soups.txt",
-                        billCalculator).setVisible(true));
+                        billCalculator,
+                        "Zupy").setVisible(true));
             }
         });
         mainDishesButton.addActionListener(new ActionListener() {
@@ -91,10 +94,38 @@ public class BillCalculator extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(() -> new Menu(billTextField,
                         "src/main/resources/MainDishes.txt",
-                        billCalculator).setVisible(true));
+                        billCalculator,
+                        "Danie główne").setVisible(true));
             }
         });
-//         todo doddać ActionListenera do Deserów, Napojów i Dodatków
+        additionalsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> new Menu(billTextField,
+                        "src/main/resources/Additionals.txt",
+                        billCalculator,
+                        "Dodatki").setVisible(true));
+
+            }
+        });
+        desertsButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> new Menu(billTextField,
+                        "src/main/resources/Deserts.txt",
+                        billCalculator,
+                        "Desery").setVisible(true));
+            }
+        });
+        drinksButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(() -> new Menu(billTextField,
+                        "src/main/resources/Drinks.txt",
+                        billCalculator,
+                        "Napoje").setVisible(true));
+            }
+        });
     }
 
     private void calculateNewBillAmount(ItemEvent e, JLabel label) {
