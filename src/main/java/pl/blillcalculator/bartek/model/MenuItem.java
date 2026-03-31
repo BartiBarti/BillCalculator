@@ -1,4 +1,4 @@
-package pl.blillcalculator.bartek.gui;
+package pl.blillcalculator.bartek.model;
 
 import java.util.Objects;
 
