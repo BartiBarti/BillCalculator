@@ -31,6 +31,7 @@ public class BillCalculator extends JFrame {
     private JButton additionalsButton;
 
     private Menu drinksMenu;
+    private Menu desertsMenu;
 
     private static BillCalculator billCalculator = new BillCalculator();
 
@@ -121,23 +122,21 @@ public class BillCalculator extends JFrame {
         desertsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(() -> new Menu(billTextField,
-                        "src/main/resources/Deserts.txt",
-                        billCalculator,
-                        "Desery",
-                        choosenDinners).setVisible(true));
+                if (desertsMenu == null || !desertsMenu.isDisplayable()) {
+                    desertsMenu = new Menu(
+                            billTextField,
+                            "src/main/resources/Deserts.txt",
+                            billCalculator,
+                            "Desery",
+                            choosenDinners
+                    );
+                    desertsMenu.setVisible(true);
+                } else {
+                    desertsMenu.toFront();
+                }
             }
         });
-//        drinksButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                SwingUtilities.invokeLater(() -> new Menu(billTextField,
-//                        "src/main/resources/Drinks.txt",
-//                        billCalculator,
-//                        "Napoje",
-//                        choosenDinners).setVisible(true));
-//            }
-//        });
+
 
         drinksButton.addActionListener(e -> {
             if (drinksMenu == null || !drinksMenu.isDisplayable()) {
