@@ -40,11 +40,9 @@ public class BillCalculator extends JFrame {
   private JButton drinksButton;
   private JButton additionalsButton;
 
-    private Menu drinksMenu;
+  private Menu drinksMenu;
 
-    private static BillCalculator billCalculator = new BillCalculator();
-
-    private Map<MenuItem, Integer> choosenDinners = new HashMap<>();
+  private Map<MenuItem, Integer> choosenDinners = new HashMap<>();
 
   private BillService billService;
 
@@ -111,54 +109,19 @@ public class BillCalculator extends JFrame {
             choosenDinners).setVisible(true));
       }
     });
-    drinksButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        SwingUtilities.invokeLater(() -> new Menu(
+    drinksButton.addActionListener(e -> {
+      if (drinksMenu == null || !drinksMenu.isDisplayable()) {
+        drinksMenu = new Menu(
             MenuType.DRINKS,
             billService,
-            choosenDinners).setVisible(true));
+            choosenDinners
+        );
+        drinksMenu.setVisible(true);
+      } else {
+        drinksMenu.toFront();
       }
     });
   }
-            }
-        });
-        desertsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(() -> new Menu(billTextField,
-                        "src/main/resources/Deserts.txt",
-                        billCalculator,
-                        "Desery",
-                        choosenDinners).setVisible(true));
-            }
-        });
-//        drinksButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                SwingUtilities.invokeLater(() -> new Menu(billTextField,
-//                        "src/main/resources/Drinks.txt",
-//                        billCalculator,
-//                        "Napoje",
-//                        choosenDinners).setVisible(true));
-//            }
-//        });
-
-        drinksButton.addActionListener(e -> {
-            if (drinksMenu == null || !drinksMenu.isDisplayable()) {
-                drinksMenu = new Menu(
-                        billTextField,
-                        "src/main/resources/Drinks.txt",
-                        billCalculator,
-                        "Napoje",
-                        choosenDinners
-                );
-                drinksMenu.setVisible(true);
-            } else {
-                drinksMenu.toFront();
-            }
-        });
-    }
 
   private void createCalculatorBillListeners() {
 
@@ -170,6 +133,7 @@ public class BillCalculator extends JFrame {
         }
       }
     });
+  }
 //        billTextField.addKeyListener(new KeyAdapter() {
 //            @Override
 //            public void keyPressed(KeyEvent e) {
@@ -186,13 +150,11 @@ public class BillCalculator extends JFrame {
 //            }
 //        });
 
+  private void setTextFieldEditability() {
+    tipTextField.setEditable(false);
+    billSumTextField.setEditable(false);
+    billTextField.setEditable(false);
   }
-
-    private void setTextFieldEditability() {
-        tipTextField.setEditable(false);
-        billSumTextField.setEditable(false);
-        billTextField.setEditable(false);
-    }
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> new BillCalculator().setVisible(true));
