@@ -1,148 +1,123 @@
 package pl.blillcalculator.bartek.gui;
 
+import pl.blillcalculator.bartek.model.MenuItem;
+import pl.blillcalculator.bartek.model.MenuType;
+import pl.blillcalculator.bartek.service.BillService;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import pl.blillcalculator.bartek.model.MenuItem;
-import pl.blillcalculator.bartek.model.MenuType;
-import pl.blillcalculator.bartek.service.BillService;
 
 
 public class BillCalculator extends JFrame {
 
-  private JPanel mainPanel;
-  private JLabel titleLabel;
-  private JTextField billTextField;
-  private JLabel billLabel;
-  private JComboBox tipPercentComboBox;
-  //    private JButton calculateBillButton;
-  private JLabel tipLabel;
-  private JTextField tipTextField;
-  private JLabel billSumLabel;
-  private JTextField billSumTextField;
-  //    private JLabel warningLabel;
-  private JLabel tipPercentLabel;
-  private JButton apetizersButton;
-  private JButton soupsButton;
-  private JLabel menuLabel;
-  private JButton mainDishesButton;
-  private JButton desertsButton;
-  private JButton drinksButton;
-  private JButton additionalsButton;
+    private JPanel mainPanel;
+    private JLabel titleLabel;
+    private JTextField billTextField;
+    private JLabel billLabel;
+    private JComboBox tipPercentComboBox;
+    //    private JButton calculateBillButton;
+    private JLabel tipLabel;
+    private JTextField tipTextField;
+    private JLabel billSumLabel;
+    private JTextField billSumTextField;
+    //    private JLabel warningLabel;
+    private JLabel tipPercentLabel;
+    private JButton apetizersButton;
+    private JButton soupsButton;
+    private JLabel menuLabel;
+    private JButton mainDishesButton;
+    private JButton desertsButton;
+    private JButton drinksButton;
+    private JButton additionalsButton;
 
     private Menu drinksMenu;
     private Menu desertsMenu;
+    private Menu additionalsMenu;
+    private Menu mainDishesMenu;
+    private Menu soupsMenu;
+    private Menu apetizersMenu;
 
-  private Map<MenuItem, Integer> choosenDinners = new HashMap<>();
+    JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
 
-  private BillService billService;
+    private Map<MenuItem, Integer> choosenDinners = new HashMap<>();
 
-  public BillCalculator() {
-    setTitle("Bill Calculator");
-    setSize(700, 350);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setLocationRelativeTo(null);
+    private BillService billService;
+
+    public BillCalculator() {
+        setTitle("Bill Calculator");
+        setSize(700, 350);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 //        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); - granica i margines dodana w pliku .form w ustawieniach
-    setContentPane(mainPanel);
-    billService = new BillService(billTextField, billSumTextField, tipTextField,
-        tipPercentComboBox);
+        setContentPane(mainPanel);
+        billService = new BillService(billTextField, billSumTextField, tipTextField,
+                tipPercentComboBox);
 
-    createCalculatorBillListeners();
-    setTextFieldEditability();
-    menuActionListeners();
+        createCalculatorBillListeners();
+        setTextFieldEditability();
+        menuActionListeners();
 
-  }
+    }
 
-  private void menuActionListeners() {
-    apetizersButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        SwingUtilities.invokeLater(() -> new Menu(
-            MenuType.APETIZERS,
-            billService,
-            choosenDinners).setVisible(true));
-      }
-    });
-    soupsButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        SwingUtilities.invokeLater(() -> new Menu(
-            MenuType.SOUPS,
-            billService,
-            choosenDinners).setVisible(true));
-      }
-    });
-    mainDishesButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        SwingUtilities.invokeLater(() -> new Menu(
-            MenuType.MAIN_DISHES,
-            billService,
-            choosenDinners).setVisible(true));
-      }
-    });
-    additionalsButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        SwingUtilities.invokeLater(() -> new Menu(
-            MenuType.ADDITIONALS,
-            billService,
-            choosenDinners).setVisible(true));
-
+    private Menu openOrRestoreMenu(Menu menu, MenuType type) {
+        if (menu == null || !menu.isDisplayable()) {
+            menu = new Menu(
+                    type,
+                    billService,
+                    choosenDinners
+            );
+            menu.setVisible(true);
+        } else {
+            if (menu.getExtendedState() == JFrame.ICONIFIED) {
+                menu.setExtendedState(JFrame.NORMAL);
             }
-        });
-        desertsButton.addActionListener(new ActionListener() {
+
+            menu.toFront();
+            menu.requestFocus();
+        }
+
+        return menu;
+    }
+
+    private void menuActionListeners() {
+        apetizersButton.addActionListener(e ->
+                apetizersMenu = openOrRestoreMenu(apetizersMenu, MenuType.APETIZERS)
+        );
+        soupsButton.addActionListener(e ->
+                soupsMenu = openOrRestoreMenu(soupsMenu, MenuType.SOUPS)
+        );
+        mainDishesButton.addActionListener(e ->
+                mainDishesMenu = openOrRestoreMenu(mainDishesMenu, MenuType.MAIN_DISHES)
+        );
+        additionalsButton.addActionListener(e ->
+                additionalsMenu = openOrRestoreMenu(additionalsMenu, MenuType.ADDITIONALS)
+        );
+
+        desertsButton.addActionListener(e ->
+                desertsMenu = openOrRestoreMenu(desertsMenu, MenuType.DESERTS)
+        );
+        drinksButton.addActionListener(e ->
+                drinksMenu = openOrRestoreMenu(drinksMenu, MenuType.DRINKS)
+        );
+    }
+
+    private void createCalculatorBillListeners() {
+
+        tipPercentComboBox.addItemListener(new ItemListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (desertsMenu == null || !desertsMenu.isDisplayable()) {
-                    desertsMenu = new Menu(
-                            MenuType.DESERTS,
-                            billService,
-                            choosenDinners
-                    );
-                    desertsMenu.setVisible(true);
-                } else {
-                    desertsMenu.toFront();
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    billService.calculateBill();
                 }
-            }
-        });
-
-
-        drinksButton.addActionListener(e -> {
-            if (drinksMenu == null || !drinksMenu.isDisplayable()) {
-                drinksMenu = new Menu(
-                        MenuType.DRINKS,
-                        billService,
-                        choosenDinners
-                );
-                drinksMenu.setVisible(true);
-            } else {
-                drinksMenu.toFront();
             }
         });
     }
 
-  private void createCalculatorBillListeners() {
-
-    tipPercentComboBox.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        if (e.getStateChange() == ItemEvent.SELECTED) {
-          billService.calculateBill();
-        }
-      }
-    });
-  }
 //        billTextField.addKeyListener(new KeyAdapter() {
 //            @Override
 //            public void keyPressed(KeyEvent e) {
@@ -159,14 +134,14 @@ public class BillCalculator extends JFrame {
 //            }
 //        });
 
-  private void setTextFieldEditability() {
-    tipTextField.setEditable(false);
-    billSumTextField.setEditable(false);
-    billTextField.setEditable(false);
-  }
+    private void setTextFieldEditability() {
+        tipTextField.setEditable(false);
+        billSumTextField.setEditable(false);
+        billTextField.setEditable(false);
+    }
 
-  public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> new BillCalculator().setVisible(true));
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new BillCalculator().setVisible(true));
 
 //        List<String> list = null;
 
@@ -180,6 +155,6 @@ public class BillCalculator extends JFrame {
 //        list.add("abc");
 //        System.out.println("czy lista jest nullem 33333 " + (list == null));
 //        System.out.println("czy lista jest pusta 33333 "  + list.isEmpty());
-  }
+    }
 
 }
