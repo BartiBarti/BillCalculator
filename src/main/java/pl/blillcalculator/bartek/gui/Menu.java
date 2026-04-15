@@ -1,11 +1,9 @@
 package pl.blillcalculator.bartek.gui;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Map;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import pl.blillcalculator.bartek.model.MenuItem;
 import pl.blillcalculator.bartek.model.MenuType;
@@ -51,27 +49,67 @@ public class Menu extends JFrame {
 
     for (MenuItem item : items) {
 
-      JCheckBox checkBox = new JCheckBox(item.getName() + " - " + item.getPrice() + " zł");
-      final Integer menuItemCount = choosenDinners.get(item) != null ? choosenDinners.get(item) : 0;
+//      JCheckBox checkBox = new JCheckBox(item.getName() + " - " + item.getPrice() + " zł");
+      JPanel row = new JPanel();
+      row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+      JLabel label = new JLabel(item.getName() + " - " + item.getPrice() + " zł");
+//      final Integer menuItemCount = choosenDinners.get(item) != null ? choosenDinners.get(item) : 0;
 
-      if (menuItemCount == 1) {
-        checkBox.setSelected(true);
-      }
+//      if (menuItemCount == 1) {
+//        checkBox.setSelected(true);
+//      }
+      int currentCount = choosenDinners.getOrDefault(item, 0);
 
-      checkBox.addItemListener(e -> {
-        if (checkBox.isSelected()) {
-          total += item.getPrice();
-          choosenDinners.put(item, menuItemCount + 1);
+      JSpinner spinner = new JSpinner(
+              new SpinnerNumberModel(currentCount, 0, 100, 1)
+      );
+      Dimension spinnerSize = new Dimension(60, spinner.getPreferredSize().height);
+      spinner.setPreferredSize(spinnerSize);
+      spinner.setMaximumSize(spinnerSize);
+
+      row.add(label);
+      row.add(Box.createHorizontalGlue()); // 🔥 to robi magię HA HA HA to już mój dodatek komentarza
+      row.add(spinner);
+
+//      checkBox.addItemListener(e -> {
+//        if (checkBox.isSelected()) {
+//          total += item.getPrice();
+//          choosenDinners.put(item, menuItemCount + 1);
+//        } else {
+//          total -= item.getPrice();
+//          choosenDinners.put(item, menuItemCount - 1);
+//        }
+//
+//        billService.updateBillTextField(total);
+//        billService.calculateBill();
+//      });
+
+      spinner.addChangeListener(e -> {
+        int value = (int) spinner.getValue();
+
+        if (value > 0) {
+          choosenDinners.put(item, value);
         } else {
-          total -= item.getPrice();
-          choosenDinners.put(item, menuItemCount - 1);
+          choosenDinners.remove(item);
         }
+
+        // 🔥 przelicz wszystko od nowa (lepsze niż kombinowanie z total +=) zrobić to samo w Java 7
+//        todo spytać chata o wytłumaczenie kodu poniżej czym są są streamy i lambdy i przepisanie bez użycia streamu
+        double newTotal = choosenDinners.entrySet().stream()
+                .mapToDouble(entry -> entry.getKey().getPrice() * entry.getValue())
+                .sum();
+
+        total = newTotal;
 
         billService.updateBillTextField(total);
         billService.calculateBill();
       });
 
-      menuPanel.add(checkBox);
+//      menuPanel.add(checkBox);
+      row.add(label);
+      row.add(spinner);
+
+      menuPanel.add(row);
     }
 
     menuPanel.revalidate();
