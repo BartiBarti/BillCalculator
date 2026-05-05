@@ -4,6 +4,7 @@ import pl.blillcalculator.bartek.model.MenuItem;
 import pl.blillcalculator.bartek.model.MenuType;
 import pl.blillcalculator.bartek.service.BillService;
 import pl.blillcalculator.bartek.service.MenuFileLoader;
+import pl.blillcalculator.bartek.model.MenuItem;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,21 +14,21 @@ import java.util.Map;
 
 public class Menu extends JFrame {
 
+    private final MenuType menuType;
     private JPanel menuPanel;
-
     private double total;
-
     private Map<MenuItem, Integer> choosenDinners;
-
     private BillService billService;
-
     private MenuFileLoader menuFileLoader;
+
+
 
     public Menu(MenuType menuType, BillService billService, Map<MenuItem, Integer> choosenDinners) {
         this.total = billService.getCurrentBillAmount();
         this.choosenDinners = choosenDinners;
         this.billService = billService;
         this.menuFileLoader = new MenuFileLoader();
+        this.menuType = menuType;
 
         configFrame(menuType.getTitle());
         List<MenuItem> menuItems = menuFileLoader.loadMenuFromFile(menuType.getFilePath());
@@ -36,9 +37,11 @@ public class Menu extends JFrame {
 
     private void configFrame(String title) {
         setTitle(title);
-        setSize(350, 200);
+        setSize(350, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+
+
         menuPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         menuPanel.setLayout(new BoxLayout(menuPanel, BoxLayout.Y_AXIS));
         setContentPane(menuPanel);
@@ -49,6 +52,10 @@ public class Menu extends JFrame {
         menuPanel.removeAll();
 
         for (MenuItem item : items) {
+
+            if (item.getAvailability() == 0) {
+                continue;
+            }
 
             JPanel row = new JPanel(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
@@ -74,26 +81,45 @@ public class Menu extends JFrame {
             gbc.insets = new Insets(2, 5, 2, 5);
             gbc.fill = GridBagConstraints.HORIZONTAL;
             row.setAlignmentX(Component.LEFT_ALIGNMENT);
-            JLabel label = new JLabel("<html>" + item.getName() + "</html>");
+
+            JLabel label = new JLabel("<html>" + item.getName() + " - " + item.getPrice() + " zł</html>");
             label.setPreferredSize(new Dimension(200, 40));
+            if (item.getAvailability() == 1) {
+                label.setForeground(Color.RED);
+            }
             gbc.gridx = 0;
-            gbc.weightx = 0.6;
+            gbc.weightx = 0.7;
             row.add(label, gbc);
 
-            JLabel priceLabel = new JLabel(item.getPrice() + " zł");
-            priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
-            gbc.gridx = 1;
-            gbc.weightx = 0.2;
-            row.add(priceLabel, gbc);
 
             int currentCount = choosenDinners.getOrDefault(item, 0);
 
             JSpinner spinner = new JSpinner(new SpinnerNumberModel(currentCount, 0, 10, 1));
             Dimension spinnerSize = new Dimension(60, 25);
             spinner.setPreferredSize(spinnerSize);
-            gbc.gridx = 2;
-            gbc.weightx = 0.2;
+            gbc.gridx = 1;
+            gbc.weightx = 0.3;
             row.add(spinner, gbc);
+
+            spinner.addChangeListener(e -> {
+                int value = (int) spinner.getValue();
+
+                if (value > 0) {
+                    choosenDinners.put(item, value);
+                } else {
+                    choosenDinners.remove(item);
+                }
+
+                double newTotal = 0;
+                for (Map.Entry<MenuItem, Integer> entry : choosenDinners.entrySet()) {
+                    newTotal += entry.getKey().getPrice() * entry.getValue();
+                }
+
+                total = newTotal;
+                billService.updateBillTextField(total);
+                billService.calculateBill();
+
+            });
 
 // todo zapytać CHATA po co te linijki poniżej
 //      label.addMouseListener(row.getMouseListeners()[0]);

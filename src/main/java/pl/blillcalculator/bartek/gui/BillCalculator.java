@@ -5,8 +5,7 @@ import pl.blillcalculator.bartek.model.MenuType;
 import pl.blillcalculator.bartek.service.BillService;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashMap;
@@ -34,6 +33,7 @@ public class BillCalculator extends JFrame {
     private JButton desertsButton;
     private JButton drinksButton;
     private JButton additionalsButton;
+    private JButton editMenuButton;
 
     private Menu drinksMenu;
     private Menu desertsMenu;
@@ -62,6 +62,9 @@ public class BillCalculator extends JFrame {
         setTextFieldEditability();
         menuActionListeners();
 
+        editMenuButton.addActionListener(e -> {
+            new EditMenu().setVisible(true);
+        });
     }
 
     private Menu openOrRestoreMenu(Menu menu, MenuType type) {
