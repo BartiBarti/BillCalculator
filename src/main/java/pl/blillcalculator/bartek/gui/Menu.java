@@ -53,10 +53,6 @@ public class Menu extends JFrame {
 
         for (MenuItem item : items) {
 
-            if (item.getAvailability() == 0) {
-                continue;
-            }
-
             JPanel row = new JPanel(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
             Color defaultColor = row.getBackground();
@@ -82,21 +78,32 @@ public class Menu extends JFrame {
             gbc.fill = GridBagConstraints.HORIZONTAL;
             row.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JLabel label = new JLabel("<html>" + item.getName() + " - " + item.getPrice() + " zł</html>");
+            String labelText = item.getName() + " - " + item.getPrice() + " zł";
+
+// Jeśli brak w magazynie, pakujemy tekst w tagi <s> (strikethrough)
+            if (item.getAvailability() == 0) {
+                labelText = "<s>" + labelText + "</s>";
+            }
+            JLabel label = new JLabel("<html>" + labelText + "</html>");
             label.setPreferredSize(new Dimension(200, 40));
+
             if (item.getAvailability() == 1) {
                 label.setForeground(Color.RED);
+            } else if (item.getAvailability() == 0) {
+                label.setForeground(Color.GRAY); // Opcjonalnie: wyszarz tekst dla lepszego efektu
             }
+
             gbc.gridx = 0;
             gbc.weightx = 0.7;
             row.add(label, gbc);
 
 
             int currentCount = choosenDinners.getOrDefault(item, 0);
-
             JSpinner spinner = new JSpinner(new SpinnerNumberModel(currentCount, 0, 10, 1));
-            Dimension spinnerSize = new Dimension(60, 25);
-            spinner.setPreferredSize(spinnerSize);
+            spinner.setPreferredSize(new Dimension(60, 25));
+            if (item.getAvailability() == 0) {
+                spinner.setEnabled(false); // Użytkownik nie kliknie w spinnera
+            }
             gbc.gridx = 1;
             gbc.weightx = 0.3;
             row.add(spinner, gbc);

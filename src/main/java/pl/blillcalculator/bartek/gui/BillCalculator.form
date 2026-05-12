@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="7" column-count="4" same-size-horizontally="true" same-size-vertically="true" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="18" y="21" width="674" height="913"/>
+      <xy x="18" y="21" width="686" height="913"/>
     </constraints>
     <properties/>
     <border type="empty">
@@ -147,10 +147,34 @@
       </component>
       <component id="57720" class="javax.swing.JButton" binding="editMenuButton">
         <constraints>
-          <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Edytuj Menu"/>
+        </properties>
+      </component>
+      <component id="4e95d" class="javax.swing.JButton" binding="clearButton">
+        <constraints>
+          <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Wyczyść"/>
+        </properties>
+      </component>
+      <component id="16f2a" class="javax.swing.JButton" binding="menuSummaryButtonnuButton">
+        <constraints>
+          <grid row="6" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Podsumowanie"/>
+        </properties>
+      </component>
+      <component id="2e7f0" class="javax.swing.JButton" binding="printMenuButton">
+        <constraints>
+          <grid row="5" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Drukuj Menu"/>
         </properties>
       </component>
     </children>

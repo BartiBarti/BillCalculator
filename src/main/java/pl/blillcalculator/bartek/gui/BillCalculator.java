@@ -5,7 +5,8 @@ import pl.blillcalculator.bartek.model.MenuType;
 import pl.blillcalculator.bartek.service.BillService;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashMap;
@@ -34,6 +35,9 @@ public class BillCalculator extends JFrame {
     private JButton drinksButton;
     private JButton additionalsButton;
     private JButton editMenuButton;
+    private JButton menuSummaryButtonnuButton;
+    private JButton clearButton;
+    private JButton printMenuButton;
 
     private Menu drinksMenu;
     private Menu desertsMenu;
@@ -41,8 +45,6 @@ public class BillCalculator extends JFrame {
     private Menu mainDishesMenu;
     private Menu soupsMenu;
     private Menu apetizersMenu;
-
-    JSpinner spinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
 
     private Map<MenuItem, Integer> choosenDinners = new HashMap<>();
 
@@ -66,6 +68,8 @@ public class BillCalculator extends JFrame {
             new EditMenu().setVisible(true);
         });
     }
+
+
 
     private Menu openOrRestoreMenu(Menu menu, MenuType type) {
         if (menu == null || !menu.isDisplayable()) {
