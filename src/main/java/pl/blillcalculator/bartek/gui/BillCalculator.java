@@ -67,9 +67,40 @@ public class BillCalculator extends JFrame {
         editMenuButton.addActionListener(e -> {
             new EditMenu().setVisible(true);
         });
+        clearButton.addActionListener(e -> clearOrder());
+
     }
 
+    private void clearOrder() {
 
+        choosenDinners.clear();
+
+        billTextField.setText("");
+        tipTextField.setText("");
+        billSumTextField.setText("");
+
+        if (drinksMenu != null) {
+            drinksMenu.dispose();
+        }
+        if (desertsMenu != null) {
+            desertsMenu.dispose();
+        }
+        if (additionalsMenu != null) {
+            additionalsMenu.dispose();
+        }
+        if (mainDishesMenu != null) {
+            mainDishesMenu.dispose();
+        }
+        if (soupsMenu != null) {
+            soupsMenu.dispose();
+        }
+        if (apetizersMenu != null) {
+            apetizersMenu.dispose();
+        }
+
+        JOptionPane.showMessageDialog(this,
+                "Zamówienie zostało wyczyszczone.");
+    }
 
     private Menu openOrRestoreMenu(Menu menu, MenuType type) {
         if (menu == null || !menu.isDisplayable()) {
