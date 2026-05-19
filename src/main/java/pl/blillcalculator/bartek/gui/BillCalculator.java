@@ -73,6 +73,39 @@ public class BillCalculator extends JFrame {
                 showOrderSummary();
             }
         });
+        clearButton.addActionListener(e -> clearOrder());
+
+    }
+
+    private void clearOrder() {
+
+        choosenDinners.clear();
+
+        billTextField.setText("");
+        tipTextField.setText("");
+        billSumTextField.setText("");
+
+        if (drinksMenu != null) {
+            drinksMenu.dispose();
+        }
+        if (desertsMenu != null) {
+            desertsMenu.dispose();
+        }
+        if (additionalsMenu != null) {
+            additionalsMenu.dispose();
+        }
+        if (mainDishesMenu != null) {
+            mainDishesMenu.dispose();
+        }
+        if (soupsMenu != null) {
+            soupsMenu.dispose();
+        }
+        if (apetizersMenu != null) {
+            apetizersMenu.dispose();
+        }
+
+        JOptionPane.showMessageDialog(this,
+                "Zamówienie zostało wyczyszczone.");
     }
 
     private void showOrderSummary() {
@@ -81,7 +114,6 @@ public class BillCalculator extends JFrame {
 
             JOptionPane.showMessageDialog(this,
                     "Puste zamówienie, nie zamówiono.");
-
             return;
         }
 
