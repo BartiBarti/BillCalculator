@@ -67,9 +67,56 @@ public class BillCalculator extends JFrame {
         editMenuButton.addActionListener(e -> {
             new EditMenu().setVisible(true);
         });
+        menuSummaryButtonnuButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showOrderSummary();
+            }
+        });
     }
 
+    private void showOrderSummary() {
 
+        if (choosenDinners.isEmpty()) {
+
+            JOptionPane.showMessageDialog(this,
+                    "Puste zamówienie, nie zamówiono.");
+
+            return;
+        }
+
+        StringBuilder summary = new StringBuilder(); // lepszy rodzaj Stringa - bardziej rozbudowany -
+        // w przypadku długich tekstów lepiej używać StringBuilder
+
+        double total = 0;
+
+        for (Map.Entry<MenuItem, Integer> entry : choosenDinners.entrySet()) {
+
+            MenuItem item = entry.getKey();
+            int quantity = entry.getValue();
+
+            double itemSum = item.getPrice() * quantity;
+
+            total += itemSum;
+
+            summary.append(item.getName())
+                    .append(" x")
+                    .append(quantity)
+                    .append(" - ")
+                    .append(String.format("%.2f", itemSum))
+                    .append(" zł\n");
+        }
+// TODO spolszczyć tekst wyświetlany na przyciskach
+        summary.append("\nTotal: ")
+                .append(String.format("%.2f", total))
+                .append(" zł");
+// TODO brakuje procentu napiwku i pokazania całej kwoty z napiwkiem
+//  TODO użyć klasy MenuSummary zamiast dialoga  - czyli przenieść i tam stworzyć konstruktor nowego okna z przyciskami
+        JOptionPane.showMessageDialog(this,
+                summary.toString(),
+                "Order summary",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
 
     private Menu openOrRestoreMenu(Menu menu, MenuType type) {
         if (menu == null || !menu.isDisplayable()) {
