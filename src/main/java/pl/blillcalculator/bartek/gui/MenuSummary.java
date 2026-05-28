@@ -24,21 +24,33 @@ public class MenuSummary extends JFrame {
     }
 
     private JPanel getButtonPanel() {
-//         todo mają byc przyciski - "Drukuj paragon" "Drukuj fakturę" "Anuluj"
         JPanel buttonPanel = new JPanel();
-        JButton printReceiptButton = new JButton("Potwierdź zamówienie");
-//        print invoice button
+
+        // TODO - zmienić szerokość przycisków, aby wypełniały całe okno i wszystkie miały taka sama szerokość (setPreferedSize)
+        JButton printReceiptButton = new JButton("Drukuj paragon");
+        JButton printInvoiceButton = new JButton("Drukuj fakturę");
         JButton cancelButton = new JButton("Anuluj");
 
+        // Akcja dla paragonu
         printReceiptButton.addActionListener(e -> {
-            // logika generująca paragon do pliku PDF
-
+            // TODO: Logika generująca paragon do pliku PDF
+            System.out.println("Generowanie paragonu PDF...");
         });
 
+        // Akcja dla faktury
+        printInvoiceButton.addActionListener(e -> {
+            // TODO: Logika generująca fakturę do pliku PDF
+            System.out.println("Generowanie faktury PDF...");
+        });
+
+        // Akcja dla anulowania
         cancelButton.addActionListener(e -> dispose());
 
+        // Dodawanie komponentów do panelu
         buttonPanel.add(printReceiptButton);
+        buttonPanel.add(printInvoiceButton);
         buttonPanel.add(cancelButton);
+
         return buttonPanel;
     }
 
