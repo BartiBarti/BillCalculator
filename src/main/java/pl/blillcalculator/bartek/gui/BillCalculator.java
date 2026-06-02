@@ -107,17 +107,20 @@ public class BillCalculator extends JFrame {
         JOptionPane.showMessageDialog(this,
                 "Zamówienie zostało wyczyszczone.");
     }
-
+    
     private void showOrderSummary() {
 
         if (choosenDinners.isEmpty()) {
-
             JOptionPane.showMessageDialog(this,
                     "Puste zamówienie, nie zamówiono.");
             return;
         }
-        new MenuSummary(choosenDinners).setVisible(true);
+
+        String selectedTipText = tipPercentComboBox.getSelectedItem().toString();
+        double tipPercent = Double.parseDouble(selectedTipText.replace("%", "").trim());
+        new MenuSummary(choosenDinners, tipPercent).setVisible(true);
     }
+
 
     private Menu openOrRestoreMenu(Menu menu, MenuType type) {
         if (menu == null || !menu.isDisplayable()) {
