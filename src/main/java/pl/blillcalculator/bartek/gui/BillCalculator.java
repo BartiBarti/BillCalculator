@@ -77,6 +77,23 @@ public class BillCalculator extends JFrame {
 
     }
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new BillCalculator().setVisible(true));
+
+//        List<String> list = null;
+
+//        System.out.println("czy lista jest nullem " + (list == null));
+////    list.isEmpty(); Tu poleci wyjątek NullPointerException ponieważ zmienna list jest null.
+//
+//        list = new ArrayList<>(); // Tu inizajalizujemy obiekt wywołując konstruktor przez new i tworząc instancje zmiennej
+//        System.out.println("czy lista jest nullem 22222 " + (list == null));
+//        System.out.println("czy lista jest pusta 22222 "  + list.isEmpty()); // Tu wyjątek NullPointerException nie poleci ponieważ zmienna list jest zainicajlizowana 2 linijki wyżej
+//
+//        list.add("abc");
+//        System.out.println("czy lista jest nullem 33333 " + (list == null));
+//        System.out.println("czy lista jest pusta 33333 "  + list.isEmpty());
+    }
+
     private void clearOrder() {
 
         choosenDinners.clear();
@@ -107,7 +124,7 @@ public class BillCalculator extends JFrame {
         JOptionPane.showMessageDialog(this,
                 "Zamówienie zostało wyczyszczone.");
     }
-    
+
     private void showOrderSummary() {
 
         if (choosenDinners.isEmpty()) {
@@ -120,7 +137,6 @@ public class BillCalculator extends JFrame {
         double tipPercent = Double.parseDouble(selectedTipText.replace("%", "").trim());
         new MenuSummary(choosenDinners, tipPercent).setVisible(true);
     }
-
 
     private Menu openOrRestoreMenu(Menu menu, MenuType type) {
         if (menu == null || !menu.isDisplayable()) {
@@ -164,18 +180,6 @@ public class BillCalculator extends JFrame {
         );
     }
 
-    private void createCalculatorBillListeners() {
-
-        tipPercentComboBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    billService.calculateBill();
-                }
-            }
-        });
-    }
-
 //        billTextField.addKeyListener(new KeyAdapter() {
 //            @Override
 //            public void keyPressed(KeyEvent e) {
@@ -192,27 +196,22 @@ public class BillCalculator extends JFrame {
 //            }
 //        });
 
+    private void createCalculatorBillListeners() {
+
+        tipPercentComboBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    billService.calculateBill();
+                }
+            }
+        });
+    }
+
     private void setTextFieldEditability() {
         tipTextField.setEditable(false);
         billSumTextField.setEditable(false);
         billTextField.setEditable(false);
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new BillCalculator().setVisible(true));
-
-//        List<String> list = null;
-
-//        System.out.println("czy lista jest nullem " + (list == null));
-////    list.isEmpty(); Tu poleci wyjątek NullPointerException ponieważ zmienna list jest null.
-//
-//        list = new ArrayList<>(); // Tu inizajalizujemy obiekt wywołując konstruktor przez new i tworząc instancje zmiennej
-//        System.out.println("czy lista jest nullem 22222 " + (list == null));
-//        System.out.println("czy lista jest pusta 22222 "  + list.isEmpty()); // Tu wyjątek NullPointerException nie poleci ponieważ zmienna list jest zainicajlizowana 2 linijki wyżej
-//
-//        list.add("abc");
-//        System.out.println("czy lista jest nullem 33333 " + (list == null));
-//        System.out.println("czy lista jest pusta 33333 "  + list.isEmpty());
     }
 
 }

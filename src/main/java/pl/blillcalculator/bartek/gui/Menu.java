@@ -4,7 +4,6 @@ import pl.blillcalculator.bartek.model.MenuItem;
 import pl.blillcalculator.bartek.model.MenuType;
 import pl.blillcalculator.bartek.service.BillService;
 import pl.blillcalculator.bartek.service.MenuFileLoader;
-import pl.blillcalculator.bartek.model.MenuItem;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,7 +19,6 @@ public class Menu extends JFrame {
     private Map<MenuItem, Integer> choosenDinners;
     private BillService billService;
     private MenuFileLoader menuFileLoader;
-
 
 
     public Menu(MenuType menuType, BillService billService, Map<MenuItem, Integer> choosenDinners) {
@@ -125,18 +123,10 @@ public class Menu extends JFrame {
                 total = newTotal;
                 billService.updateBillTextField(total);
                 billService.calculateBill();
-
             });
 
-// todo zapytać CHATA po co te linijki poniżej
-//      label.addMouseListener(row.getMouseListeners()[0]);
-//      priceLabel.addMouseListener(row.getMouseListeners()[0]);
-//      spinner.addMouseListener(row.getMouseListeners()[0]);
-
-// 🔥
             spinner.addChangeListener(e -> {
                 int value = (int) spinner.getValue();
-
                 if (value > 0) {
                     choosenDinners.put(item, value);
                 } else {
@@ -145,6 +135,7 @@ public class Menu extends JFrame {
 
                 // 🔥 przelicz wszystko od nowa (lepsze niż kombinowanie z total +=) zrobić to samo w Java 7
 //        todo spytać chata o wytłumaczenie kodu poniżej czym są są streamy i lambdy i przepisanie bez użycia streamu
+//                Powinno być napisane na zwykłych pętlach
                 double newTotal = choosenDinners.entrySet().stream()
                         .mapToDouble(entry -> entry.getKey().getPrice() * entry.getValue())
                         .sum();

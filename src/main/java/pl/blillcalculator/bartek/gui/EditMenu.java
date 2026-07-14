@@ -5,8 +5,6 @@ import pl.blillcalculator.bartek.service.MenuFileLoader;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class EditMenu extends JFrame {
     private JLabel descComboBoxLabel;
@@ -19,6 +17,7 @@ public class EditMenu extends JFrame {
     private MenuType menuType;
 
     private MenuFileLoader menuFileLoader = new MenuFileLoader();
+
     public EditMenu() {
         String choosenMenu = (String) menuComboBox.getSelectedItem();
         this.menuType = MenuType.getByTitle(choosenMenu);
@@ -51,7 +50,6 @@ public class EditMenu extends JFrame {
 
         cancelButton.addActionListener(e -> dispose());
     }
-
 
 
 }
