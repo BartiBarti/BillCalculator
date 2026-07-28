@@ -9,7 +9,6 @@ import java.util.Map;
 
 public class MenuSummary extends JFrame {
 
-    private static int receiptCounter = 1;
     private final double tipPercentage;
     private double total = 0;
     private PdfService pdfService = new PdfService();
@@ -27,8 +26,11 @@ public class MenuSummary extends JFrame {
         bottomContainer.add(summaryPanel, BorderLayout.CENTER);
         bottomContainer.add(buttonPanel, BorderLayout.SOUTH);
 
-        add(new JScrollPane(orderSummaryTextArea), BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(orderSummaryTextArea);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        add(scrollPane, BorderLayout.CENTER);
         add(bottomContainer, BorderLayout.SOUTH);
+
     }
 
     private JPanel getButtonPanel(Map<MenuItem, Integer> choosenDinners) {
@@ -49,13 +51,20 @@ public class MenuSummary extends JFrame {
 
         // Akcja dla paragonu
         printReceiptButton.addActionListener(e -> {
-            System.out.println("Generowanie paragonu PDF...");
-            pdfService.generateReceiptPDF(choosenDinners, receiptCounter, tipPercentage, total);
+            pdfService.generateReceiptPDF(choosenDinners, tipPercentage, total);
+            printReceiptButton.setEnabled(false);
+            printInvoiceButton.setEnabled(false);
+            cancelButton.setText("Zamknij");
+            JOptionPane.showMessageDialog(this,
+                    "Transakcja dokonana! Paragon został wykreowany i wydrukowany.",
+                    "Status transakcji",
+                    JOptionPane.INFORMATION_MESSAGE);
+
         });
 
         // Akcja dla faktury
         printInvoiceButton.addActionListener(e -> {
-            System.out.println("Generowanie faktury PDF...");
+//            todo - implementacja - akcji przycisku analogicznie, jak przy paragonie
         });
 
         // Akcja dla anulowania
@@ -95,11 +104,12 @@ public class MenuSummary extends JFrame {
                     .append(" - ").append(String.format("%.2f", itemSum))
                     .append(" zł\n");
         }
-// todo 3 dodać marginesy po 10 px po każdej stronie textArea
+
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         textArea.setText(itemsText.toString());
+        textArea.setMargin(new Insets(10, 10, 10, 10));
 
         return textArea;
     }

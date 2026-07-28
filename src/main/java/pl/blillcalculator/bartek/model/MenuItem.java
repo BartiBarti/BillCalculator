@@ -18,7 +18,7 @@ public class MenuItem {
     public MenuItem(String name, double price, int availability) {
         this.name = name;
         this.price = price;
-//     todo sprawdzić, (Za pomocą IF) czy parametr availability ma wartość 0, 1 albo 2 w przeciwnym razie rzecamy błąd.
+//     todo  sprawdzić, (Za pomocą IF) czy parametr availability ma wartość 0, 1 albo 2 w przeciwnym razie rzecamy własny błąd.
         this.availability = availability;
     }
 

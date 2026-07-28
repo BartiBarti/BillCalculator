@@ -1,82 +1,172 @@
 package pl.blillcalculator.bartek.service;
 
+import com.lowagie.text.Font;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.BaseFont;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import pl.blillcalculator.bartek.model.MenuItem;
 
 import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Properties;
+
+
+//         todo 1 Dane firmy mają być na paragonie z pliku - receipt_config.properties
+//          todo 2 - długi paragon musi się mieścić na jednej stronie
+//          todo 3 wyciągnąć powtarzające się stringi do stałych finalnych, nazwę folderu, oraz nazwę pliku z paragonem
+//          todo 4 podzielić metodę generateReceiptPdf na prywatne metody (krótsze)
+//          todo 5 - sprawdzić, czy nazwy zmiennych faktycznie odpowiadają temu co przechowują
 
 public class PdfService {
 
+    private static final String CONFIG_FILE = "src/main/resources/receipt_config.properties";
 
-    public void generateReceiptPDF(Map<MenuItem, Integer> choosenDinners, int receiptCounter, double tipPercentage, double total) {
-//        todo Dodać importy zamiast wskazywać pełną ścieżkę do klas,
-//        todo zastanowić się jak numerować paragony, ponieważ przy obecnym mechanizmie po wyłączeniu aplikacji licznik znowu numeruje od 1
-//         1 Dane firmy mają być na paragonie z pliku - tu może być trzymany numer paragonu aktualny kolejny (podpowiedź Mateusza)
-//        todo po wyłączeniu programu musza być zapamiętane numery paragonów.
-//         2 - paragony numerowane
-//         3 drukowanie godziny i daty,
-//         4 - paragon jak w sklepie wg wzoru z Google
-//         5 -Po generowaniu paragonu od razu go otwierać
-//         6 - generować paragony do osobnego folderu receipts oddzielnie za każdy miesiąc
-        com.lowagie.text.Document document = new com.lowagie.text.Document();
+    // Główna metoda - usunęliśmy 'int receiptCounter' z parametrów!
+    public void generateReceiptPDF(Map<MenuItem, Integer> choosenDinners, double tipPercentage, double total) {
+
+        // 1. Pobranie unikalnego numeru paragonu dla bieżącego miesiąca
+        int currentReceiptNumber = getAndUpdateReceiptCounter();
+
+        // 2. Przygotowanie dynamicznej ścieżki do folderu (np. receipts/2026-07) - KROK 6
+        String currentMonthFolder = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        File directory = new File("receipts/" + currentMonthFolder);
+        if (!directory.exists()) {
+            directory.mkdirs(); // Tworzy foldery, jeśli nie istnieją
+        }
+
+        String receiptFileName = "paragon_" + currentReceiptNumber + ".pdf";
+        File receiptPdfFile = new File(directory, receiptFileName);
+
+        // Ustawienie wąskiego formatu rolki sklepowej
+        Document document = new Document(new Rectangle(150, 550), 10, 10, 10, 10);
+//        todo to 550 ma być dynamiczne ( dynamiczne określenie długości paragonu w zależności od ilości zamówień)
+//        odnosi sie do drugiego todo
+
         try {
-            // dynamiczna nazwa pliku, np. paragon_1.pdf, paragon_2.pdf, żeby nie nadpisywać starego
-            String fileName = "paragon_" + receiptCounter + ".pdf";
-            com.lowagie.text.pdf.PdfWriter.getInstance(document, new java.io.FileOutputStream(fileName));
+            PdfWriter.getInstance(document, new FileOutputStream(receiptPdfFile));
             document.open();
 
-            com.lowagie.text.pdf.BaseFont baseFont = com.lowagie.text.pdf.BaseFont.createFont(
-                    com.lowagie.text.pdf.BaseFont.HELVETICA,
-                    com.lowagie.text.pdf.BaseFont.CP1250,
-                    com.lowagie.text.pdf.BaseFont.EMBEDDED
-            );
-            com.lowagie.text.Font titleFont = new com.lowagie.text.Font(baseFont, 16, com.lowagie.text.Font.BOLD);
-            com.lowagie.text.Font regularFont = new com.lowagie.text.Font(baseFont, 12, com.lowagie.text.Font.NORMAL);
+            // Ustawienie czcionki COURIER z obsługą polskich znaków
+            BaseFont baseFont = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1250, BaseFont.EMBEDDED);
+            Font companyFont = new Font(baseFont, 7, Font.NORMAL);
+            Font titleFont = new Font(baseFont, 9, Font.BOLD);
+            Font regularFont = new Font(baseFont, 7, Font.NORMAL);
+            Font totalFont = new Font(baseFont, 11, Font.BOLD);
 
-            // <<< NOWOŚĆ: Pobieranie i formatowanie aktualnej daty >>>
-            java.time.LocalDate today = java.time.LocalDate.now();
-            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            String formattedDate = today.format(formatter);
+            // Dane firmy
+            Paragraph header = new Paragraph();
+            header.setAlignment(Element.ALIGN_CENTER);
+            header.add(new Chunk("Bar Mateusz & Bartek\n", companyFont));
+            header.add(new Chunk("Komputerowa 5 version 4.0\n", companyFont));
+            header.add(new Chunk("95-100 Zgierz\n", companyFont));
+            header.add(new Chunk("NIP 1234567890\n", companyFont));
+            header.add(new Chunk("REGON 987654321\n\n", companyFont));
+            document.add(header);
 
-            // Nagłówek paragonu z numerem i datą
-            com.lowagie.text.Paragraph title = new com.lowagie.text.Paragraph("PARAGON FISKALNY\n", titleFont);
-            title.setAlignment(com.lowagie.text.Element.ALIGN_CENTER);
-            document.add(title);
+            // Tytuł dokumentu
+            Paragraph docType = new Paragraph("PARAGON FISKALNY\n", titleFont);
+            docType.setAlignment(Element.ALIGN_CENTER);
+            document.add(docType);
 
-            // <<< NOWOŚĆ: Wyświetlenie numeru paragonu oraz daty >>>
-            com.lowagie.text.Paragraph details = new com.lowagie.text.Paragraph(
-                    String.format("Paragon nr: %d\nData transakcji: %s\n", receiptCounter, formattedDate), regularFont);
-            details.setAlignment(com.lowagie.text.Element.ALIGN_CENTER);
-            document.add(details);
+            Paragraph docNum = new Paragraph("Numer dokumentu: " + currentReceiptNumber + "\n", regularFont);
+            docNum.setAlignment(Element.ALIGN_LEFT);
+            document.add(docNum);
 
-            document.add(new com.lowagie.text.Paragraph("------------------------------------------------------------------------", regularFont));
+            document.add(new Paragraph("- - - - - - - - - - - - - - - - - -", regularFont));
 
-            // Lista pozycji z zamówienia
-            for (Map.Entry<pl.blillcalculator.bartek.model.MenuItem, Integer> entry : choosenDinners.entrySet()) {
-                pl.blillcalculator.bartek.model.MenuItem item = entry.getKey();
+            // Tabela z pozycjami zamówienia
+            PdfPTable table = new PdfPTable(2);
+            table.setWidthPercentage(100);
+            table.setWidths(new float[]{70, 30});
+
+            for (Map.Entry<MenuItem, Integer> entry : choosenDinners.entrySet()) {
+                MenuItem item = entry.getKey();
                 int quantity = entry.getValue();
                 double itemSum = item.getPrice() * quantity;
 
-                String line = String.format("%s x%d - %.2f zł", item.getName(), quantity, itemSum);
-                document.add(new com.lowagie.text.Paragraph(line, regularFont));
-            }
+                String itemDetails = String.format("%s\n  %d szt x %.2f", item.getName(), quantity, item.getPrice());
+                PdfPCell cellLeft = new PdfPCell(new Phrase(itemDetails, regularFont));
+                cellLeft.setBorder(Rectangle.NO_BORDER);
+                cellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
 
-            // Obliczenia końcowe
+                PdfPCell cellRight = new PdfPCell(new Phrase(String.format("%.2f", itemSum), regularFont));
+                cellRight.setBorder(Rectangle.NO_BORDER);
+                cellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cellRight.setVerticalAlignment(Element.ALIGN_BOTTOM);
+
+                table.addCell(cellLeft);
+                table.addCell(cellRight);
+            }
+            document.add(table);
+
+            document.add(new Paragraph("- - - - - - - - - - - - - - - - - -", regularFont));
+
+            // Obliczenia końcowe i podsumowanie
             double tipAmount = total * (tipPercentage / 100);
             double finalTotal = total + tipAmount;
 
-            document.add(new com.lowagie.text.Paragraph("------------------------------------------------------------------------", regularFont));
-            document.add(new com.lowagie.text.Paragraph(String.format("Suma: %.2f zł", total), regularFont));
-            document.add(new com.lowagie.text.Paragraph(String.format("Napiwek (%.0f%%): %.2f zł", tipPercentage, tipAmount), regularFont));
-            document.add(new com.lowagie.text.Paragraph("\n", regularFont));
-            document.add(new com.lowagie.text.Paragraph(String.format("RAZEM DO ZAPŁATY: %.2f zł", finalTotal), titleFont));
+            PdfPTable summaryTable = new PdfPTable(2);
+            summaryTable.setWidthPercentage(100);
+            summaryTable.setWidths(new float[]{65, 35});
+
+            addSummaryRow(summaryTable, "Sprzedaż opodatkowana:", String.format("%.2f", total), regularFont);
+            addSummaryRow(summaryTable, String.format("Napiwek (%.0f%%):", tipPercentage), String.format("%.2f", tipAmount), regularFont);
+            document.add(summaryTable);
+
+            document.add(new Paragraph("- - - - - - - - - - - - - - - - - -", regularFont));
+
+            // Sekcja SUMA
+            PdfPTable totalTable = new PdfPTable(2);
+            totalTable.setWidthPercentage(100);
+            totalTable.setWidths(new float[]{50, 50});
+
+            PdfPCell totalLabel = new PdfPCell(new Phrase("SUMA PLN", totalFont));
+            totalLabel.setBorder(Rectangle.NO_BORDER);
+            totalLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            PdfPCell totalVal = new PdfPCell(new Phrase(String.format("%.2f", finalTotal), totalFont));
+            totalVal.setBorder(Rectangle.NO_BORDER);
+            totalVal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+            totalTable.addCell(totalLabel);
+            totalTable.addCell(totalVal);
+            document.add(totalTable);
+
+            document.add(new Paragraph("- - - - - - - - - - - - - - - - - -", regularFont));
+
+            // Data i dokładny czas transakcji (sekundy)
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = now.format(timeFormatter);
+
+            Paragraph footerDate = new Paragraph(formattedDateTime, regularFont);
+            footerDate.setAlignment(Element.ALIGN_CENTER);
+            document.add(footerDate);
+
+            // Unikalny kod transakcji systemowej na samym dole
+            String codeTimestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            String transactionCode = String.format("NR-%d-%s", currentReceiptNumber, codeTimestamp);
+
+            Paragraph codeParagraph = new Paragraph(transactionCode, regularFont);
+            codeParagraph.setAlignment(Element.ALIGN_CENTER);
+            document.add(codeParagraph);
 
             document.close();
 
-            JOptionPane.showMessageDialog(null, "Wygenerowano " + fileName + "!");
-
-            // <<< NOWOŚĆ: Zwiększamy licznik o 1 przy każdym udanym drukowaniu >>>
-            receiptCounter++;
+            // KROK 5: Automatyczne otwieranie pliku PDF po wygenerowaniu
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(receiptPdfFile);
+            } else {
+                JOptionPane.showMessageDialog(null, "Wygenerowano: " + receiptPdfFile.getAbsolutePath());
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -84,5 +174,49 @@ public class PdfService {
         }
     }
 
+    // Pomocnicza metoda do zapisu licznika i sprawdzania nowego miesiąca
+    private int getAndUpdateReceiptCounter() {
+        Properties props = new Properties();
+        int counter = 1;
+        String currentYearAndMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String savedYearAndMonth = "";
 
+        if (new File(CONFIG_FILE).exists()) {
+            try (InputStream input = new FileInputStream(CONFIG_FILE)) {
+                props.load(input);
+                savedYearAndMonth = props.getProperty("lastMonth", "");
+                if (currentYearAndMonth.equals(savedYearAndMonth)) {
+                    counter = Integer.parseInt(props.getProperty("counter", "1"));
+                }
+            } catch (IOException | NumberFormatException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try (OutputStream output = new FileOutputStream(CONFIG_FILE)) {
+            props.setProperty("counter", String.valueOf(counter + 1));
+            if (!savedYearAndMonth.equals(currentYearAndMonth)) {
+                props.setProperty("lastMonth", currentYearAndMonth);
+            }
+            props.store(output, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return counter;
+    }
+
+    private void addSummaryRow(PdfPTable table, String label, String value, Font font) {
+        PdfPCell cellLbl = new PdfPCell(new Phrase(label, font));
+        cellLbl.setBorder(Rectangle.NO_BORDER);
+        cellLbl.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+        PdfPCell cellVal = new PdfPCell(new Phrase(value, font));
+        cellVal.setBorder(Rectangle.NO_BORDER);
+        cellVal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+        table.addCell(cellLbl);
+        table.addCell(cellVal);
+    }
 }
+

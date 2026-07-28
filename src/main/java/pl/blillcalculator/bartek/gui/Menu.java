@@ -134,7 +134,7 @@ public class Menu extends JFrame {
                 }
 
                 // 🔥 przelicz wszystko od nowa (lepsze niż kombinowanie z total +=) zrobić to samo w Java 7
-//        todo spytać chata o wytłumaczenie kodu poniżej czym są są streamy i lambdy i przepisanie bez użycia streamu
+//        todo  spytać chata o wytłumaczenie kodu poniżej czym są są streamy i lambdy i przepisanie bez użycia streamu
 //                Powinno być napisane na zwykłych pętlach
                 double newTotal = choosenDinners.entrySet().stream()
                         .mapToDouble(entry -> entry.getKey().getPrice() * entry.getValue())
