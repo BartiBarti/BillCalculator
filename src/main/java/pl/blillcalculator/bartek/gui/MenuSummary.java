@@ -64,7 +64,7 @@ public class MenuSummary extends JFrame {
 
         // Akcja dla faktury
         printInvoiceButton.addActionListener(e -> {
-//            todo - implementacja - akcji przycisku analogicznie, jak przy paragonie
+//             implementacja - akcji przycisku analogicznie, jak przy paragonie
         });
 
         // Akcja dla anulowania

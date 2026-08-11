@@ -16,10 +16,9 @@ public class MenuItem {
     private int availability;
 
     public MenuItem(String name, double price, int availability) {
+        setAvailability(availability);
         this.name = name;
         this.price = price;
-//     todo  sprawdzić, (Za pomocą IF) czy parametr availability ma wartość 0, 1 albo 2 w przeciwnym razie rzecamy własny błąd.
-        this.availability = availability;
     }
 
     public int getAvailability() {
@@ -27,6 +26,9 @@ public class MenuItem {
     }
 
     public void setAvailability(int availability) {
+        if (availability < 0 || availability > 2) {
+            throw new IllegalArgumentException("Niepoprawna wartość " + availability + ". Dozwolone wartości to 0, 1 lub 2.");
+        }
         this.availability = availability;
     }
 

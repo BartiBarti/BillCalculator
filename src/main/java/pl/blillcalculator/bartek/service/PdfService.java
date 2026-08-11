@@ -20,11 +20,11 @@ import java.util.Properties;
 
 
 //         todo 1 Dane firmy mają być na paragonie z pliku - receipt_config.properties
-//          todo 2 - długi paragon musi się mieścić na jednej stronie
 //          todo 3 wyciągnąć powtarzające się stringi do stałych finalnych, nazwę folderu, oraz nazwę pliku z paragonem
 //          todo 4 podzielić metodę generateReceiptPdf na prywatne metody (krótsze)
 //          todo 5 - sprawdzić, czy nazwy zmiennych faktycznie odpowiadają temu co przechowują
-
+//          todo 6 - po wygenerowaniu paragonu - czyścic zamówienie i zamykać okno z podsumowaniem (tak, aby nie można było wygenerować
+//           jeszcze raz paragonu ze zmienionym zamówieniem - Na końcu zrobić)
 public class PdfService {
 
     private static final String CONFIG_FILE = "src/main/resources/receipt_config.properties";
@@ -44,11 +44,15 @@ public class PdfService {
 
         String receiptFileName = "paragon_" + currentReceiptNumber + ".pdf";
         File receiptPdfFile = new File(directory, receiptFileName);
+        int baseHeight = 250;
+        int itemHeight = 25;
+        int calculatedHeight = baseHeight + (choosenDinners.size() * itemHeight);
 
-        // Ustawienie wąskiego formatu rolki sklepowej
-        Document document = new Document(new Rectangle(150, 550), 10, 10, 10, 10);
-//        todo to 550 ma być dynamiczne ( dynamiczne określenie długości paragonu w zależności od ilości zamówień)
-//        odnosi sie do drugiego todo
+        // Zabezpieczenie: minimalna wysokość to 300, żeby krótki paragon nie wyglądał dziwnie
+        calculatedHeight = Math.max(calculatedHeight, 350);
+
+        // Ustawienie szerokości na 150 i dynamicznej wysokości
+        Document document = new Document(new Rectangle(150, calculatedHeight), 10, 10, 10, 10);
 
         try {
             PdfWriter.getInstance(document, new FileOutputStream(receiptPdfFile));
@@ -219,4 +223,3 @@ public class PdfService {
         table.addCell(cellVal);
     }
 }
-
