@@ -20,14 +20,10 @@ import java.util.Properties;
 
 
 //         todo 1 Dane firmy mają być na paragonie z pliku - receipt_config.properties
-//          todo 3 wyciągnąć powtarzające się stringi do stałych finalnych, nazwę folderu, oraz nazwę pliku z paragonem
-//          todo 4 podzielić metodę generateReceiptPdf na prywatne metody (krótsze)
-//          todo 5 - sprawdzić, czy nazwy zmiennych faktycznie odpowiadają temu co przechowują
 //          todo 6 - po wygenerowaniu paragonu - czyścic zamówienie i zamykać okno z podsumowaniem (tak, aby nie można było wygenerować
 //           jeszcze raz paragonu ze zmienionym zamówieniem - Na końcu zrobić)
 public class PdfService {
 
-    private static final String CONFIG_FILE = "src/main/resources/receipt_config.properties";
 
     // Główna metoda - usunęliśmy 'int receiptCounter' z parametrów!
     public void generateReceiptPDF(Map<MenuItem, Integer> choosenDinners, double tipPercentage, double total) {
@@ -36,141 +32,34 @@ public class PdfService {
         int currentReceiptNumber = getAndUpdateReceiptCounter();
 
         // 2. Przygotowanie dynamicznej ścieżki do folderu (np. receipts/2026-07) - KROK 6
-        String currentMonthFolder = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
-        File directory = new File("receipts/" + currentMonthFolder);
-        if (!directory.exists()) {
-            directory.mkdirs(); // Tworzy foldery, jeśli nie istnieją
-        }
+        File receiptPdfFile = getReceiptPdfFile(currentReceiptNumber);
 
-        String receiptFileName = "paragon_" + currentReceiptNumber + ".pdf";
-        File receiptPdfFile = new File(directory, receiptFileName);
-        int baseHeight = 250;
-        int itemHeight = 25;
-        int calculatedHeight = baseHeight + (choosenDinners.size() * itemHeight);
-
+        int calculatedHeight = ReceiptConstant.RECEIPT_BASE_HEIGHT + (choosenDinners.size() * ReceiptConstant.RECEIPT_ITEM_HEIGHT);
         // Zabezpieczenie: minimalna wysokość to 300, żeby krótki paragon nie wyglądał dziwnie
-        calculatedHeight = Math.max(calculatedHeight, 350);
-
+        calculatedHeight = Math.max(calculatedHeight, ReceiptConstant.RECEIPT_MIN_HEIGHT);
         // Ustawienie szerokości na 150 i dynamicznej wysokości
-        Document document = new Document(new Rectangle(150, calculatedHeight), 10, 10, 10, 10);
+        Document rootDocument = new Document(new Rectangle(ReceiptConstant.RECEIPT_WIDTH, calculatedHeight), 10, 10, 10, 10);
 
         try {
-            PdfWriter.getInstance(document, new FileOutputStream(receiptPdfFile));
-            document.open();
+            PdfWriter.getInstance(rootDocument, new FileOutputStream(receiptPdfFile));
+            rootDocument.open();
 
             // Ustawienie czcionki COURIER z obsługą polskich znaków
             BaseFont baseFont = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1250, BaseFont.EMBEDDED);
-            Font companyFont = new Font(baseFont, 7, Font.NORMAL);
             Font titleFont = new Font(baseFont, 9, Font.BOLD);
             Font regularFont = new Font(baseFont, 7, Font.NORMAL);
             Font totalFont = new Font(baseFont, 11, Font.BOLD);
 
-            // Dane firmy
-            Paragraph header = new Paragraph();
-            header.setAlignment(Element.ALIGN_CENTER);
-            header.add(new Chunk("Bar Mateusz & Bartek\n", companyFont));
-            header.add(new Chunk("Komputerowa 5 version 4.0\n", companyFont));
-            header.add(new Chunk("95-100 Zgierz\n", companyFont));
-            header.add(new Chunk("NIP 1234567890\n", companyFont));
-            header.add(new Chunk("REGON 987654321\n\n", companyFont));
-            document.add(header);
+            addCompanyData(rootDocument, regularFont);
+            addReceiptBasicData(currentReceiptNumber, rootDocument, titleFont, regularFont);
+            PdfPTable table = addMenuItemData(choosenDinners, regularFont);
+            rootDocument.add(table);
+            rootDocument.add(new Paragraph(ReceiptConstant.RECEIPT_HORIZONTAL_LINE, regularFont));
+            addReceiptSummaryData(tipPercentage, total, rootDocument, regularFont, totalFont);
+            addReceiptFooter(currentReceiptNumber, rootDocument, regularFont);
+            rootDocument.close();
 
-            // Tytuł dokumentu
-            Paragraph docType = new Paragraph("PARAGON FISKALNY\n", titleFont);
-            docType.setAlignment(Element.ALIGN_CENTER);
-            document.add(docType);
-
-            Paragraph docNum = new Paragraph("Numer dokumentu: " + currentReceiptNumber + "\n", regularFont);
-            docNum.setAlignment(Element.ALIGN_LEFT);
-            document.add(docNum);
-
-            document.add(new Paragraph("- - - - - - - - - - - - - - - - - -", regularFont));
-
-            // Tabela z pozycjami zamówienia
-            PdfPTable table = new PdfPTable(2);
-            table.setWidthPercentage(100);
-            table.setWidths(new float[]{70, 30});
-
-            for (Map.Entry<MenuItem, Integer> entry : choosenDinners.entrySet()) {
-                MenuItem item = entry.getKey();
-                int quantity = entry.getValue();
-                double itemSum = item.getPrice() * quantity;
-
-                String itemDetails = String.format("%s\n  %d szt x %.2f", item.getName(), quantity, item.getPrice());
-                PdfPCell cellLeft = new PdfPCell(new Phrase(itemDetails, regularFont));
-                cellLeft.setBorder(Rectangle.NO_BORDER);
-                cellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
-
-                PdfPCell cellRight = new PdfPCell(new Phrase(String.format("%.2f", itemSum), regularFont));
-                cellRight.setBorder(Rectangle.NO_BORDER);
-                cellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                cellRight.setVerticalAlignment(Element.ALIGN_BOTTOM);
-
-                table.addCell(cellLeft);
-                table.addCell(cellRight);
-            }
-            document.add(table);
-
-            document.add(new Paragraph("- - - - - - - - - - - - - - - - - -", regularFont));
-
-            // Obliczenia końcowe i podsumowanie
-            double tipAmount = total * (tipPercentage / 100);
-            double finalTotal = total + tipAmount;
-
-            PdfPTable summaryTable = new PdfPTable(2);
-            summaryTable.setWidthPercentage(100);
-            summaryTable.setWidths(new float[]{65, 35});
-
-            addSummaryRow(summaryTable, "Sprzedaż opodatkowana:", String.format("%.2f", total), regularFont);
-            addSummaryRow(summaryTable, String.format("Napiwek (%.0f%%):", tipPercentage), String.format("%.2f", tipAmount), regularFont);
-            document.add(summaryTable);
-
-            document.add(new Paragraph("- - - - - - - - - - - - - - - - - -", regularFont));
-
-            // Sekcja SUMA
-            PdfPTable totalTable = new PdfPTable(2);
-            totalTable.setWidthPercentage(100);
-            totalTable.setWidths(new float[]{50, 50});
-
-            PdfPCell totalLabel = new PdfPCell(new Phrase("SUMA PLN", totalFont));
-            totalLabel.setBorder(Rectangle.NO_BORDER);
-            totalLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
-
-            PdfPCell totalVal = new PdfPCell(new Phrase(String.format("%.2f", finalTotal), totalFont));
-            totalVal.setBorder(Rectangle.NO_BORDER);
-            totalVal.setHorizontalAlignment(Element.ALIGN_RIGHT);
-
-            totalTable.addCell(totalLabel);
-            totalTable.addCell(totalVal);
-            document.add(totalTable);
-
-            document.add(new Paragraph("- - - - - - - - - - - - - - - - - -", regularFont));
-
-            // Data i dokładny czas transakcji (sekundy)
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String formattedDateTime = now.format(timeFormatter);
-
-            Paragraph footerDate = new Paragraph(formattedDateTime, regularFont);
-            footerDate.setAlignment(Element.ALIGN_CENTER);
-            document.add(footerDate);
-
-            // Unikalny kod transakcji systemowej na samym dole
-            String codeTimestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            String transactionCode = String.format("NR-%d-%s", currentReceiptNumber, codeTimestamp);
-
-            Paragraph codeParagraph = new Paragraph(transactionCode, regularFont);
-            codeParagraph.setAlignment(Element.ALIGN_CENTER);
-            document.add(codeParagraph);
-
-            document.close();
-
-            // KROK 5: Automatyczne otwieranie pliku PDF po wygenerowaniu
-            if (Desktop.isDesktopSupported()) {
-                Desktop.getDesktop().open(receiptPdfFile);
-            } else {
-                JOptionPane.showMessageDialog(null, "Wygenerowano: " + receiptPdfFile.getAbsolutePath());
-            }
+            openReceipt(receiptPdfFile);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -178,29 +67,155 @@ public class PdfService {
         }
     }
 
+    private void openReceipt(File receiptPdfFile) throws IOException {
+        // KROK 5: Automatyczne otwieranie pliku PDF po wygenerowaniu
+        if (Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().open(receiptPdfFile);
+        } else {
+            JOptionPane.showMessageDialog(null, "Wygenerowano: " + receiptPdfFile.getAbsolutePath());
+        }
+    }
+
+    private void addReceiptFooter(int currentReceiptNumber, Document rootDocument, Font regularFont) {
+        // Data i dokładny czas transakcji (sekundy)
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(ReceiptConstant.RECEIPT_DATE_PATTERN);
+        String formattedDateTime = now.format(timeFormatter);
+
+        Paragraph footerDate = new Paragraph(formattedDateTime, regularFont);
+        footerDate.setAlignment(Element.ALIGN_CENTER);
+        rootDocument.add(footerDate);
+
+        // Unikalny kod transakcji systemowej na samym dole
+        String codeTimestamp = now.format(DateTimeFormatter.ofPattern(ReceiptConstant.RECEIPT_CODE_DATE_PATTERN));
+        String transactionCode = String.format("NR-%d-%s", currentReceiptNumber, codeTimestamp);
+
+        Paragraph codeParagraph = new Paragraph(transactionCode, regularFont);
+        codeParagraph.setAlignment(Element.ALIGN_CENTER);
+        rootDocument.add(codeParagraph);
+    }
+
+    private void addReceiptSummaryData(double tipPercentage, double total, Document rootDocument, Font regularFont, Font totalFont) {
+        // Obliczenia końcowe i podsumowanie
+        double tipAmount = total * (tipPercentage / 100);
+        double finalTotal = total + tipAmount;
+
+        PdfPTable summaryTable = new PdfPTable(2);
+        summaryTable.setWidthPercentage(100);
+        summaryTable.setWidths(new float[]{65, 35});
+
+        addSummaryRow(summaryTable, "Sprzedaż opodatkowana:", String.format(ReceiptConstant.RECEIPT_AMOUNT_ROUNDING, total), regularFont);
+        addSummaryRow(summaryTable, String.format("Napiwek (%.0f%%):", tipPercentage), String.format(ReceiptConstant.RECEIPT_AMOUNT_ROUNDING, tipAmount), regularFont);
+        rootDocument.add(summaryTable);
+
+        rootDocument.add(new Paragraph(ReceiptConstant.RECEIPT_HORIZONTAL_LINE, regularFont));
+
+        // Sekcja SUMA
+        PdfPTable totalTable = new PdfPTable(2);
+        totalTable.setWidthPercentage(100);
+        totalTable.setWidths(new float[]{50, 50});
+
+        PdfPCell totalLabel = new PdfPCell(new Phrase("SUMA PLN", totalFont));
+        totalLabel.setBorder(Rectangle.NO_BORDER);
+        totalLabel.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+        PdfPCell totalVal = new PdfPCell(new Phrase(String.format(ReceiptConstant.RECEIPT_AMOUNT_ROUNDING, finalTotal), totalFont));
+        totalVal.setBorder(Rectangle.NO_BORDER);
+        totalVal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+        totalTable.addCell(totalLabel);
+        totalTable.addCell(totalVal);
+        rootDocument.add(totalTable);
+
+        rootDocument.add(new Paragraph(ReceiptConstant.RECEIPT_HORIZONTAL_LINE, regularFont));
+    }
+
+    private PdfPTable addMenuItemData(Map<MenuItem, Integer> choosenDinners, Font regularFont) {
+        // Tabela z pozycjami zamówienia
+        PdfPTable menuItemTable = new PdfPTable(2);
+        menuItemTable.setWidthPercentage(100);
+        menuItemTable.setWidths(new float[]{70, 30});
+
+        for (Map.Entry<MenuItem, Integer> entry : choosenDinners.entrySet()) {
+            MenuItem menuItem = entry.getKey();
+            int quantity = entry.getValue();
+            double itemSum = menuItem.getPrice() * quantity;
+
+            String menuItemDetails = String.format("%s\n  %d szt x %.2f", menuItem.getName(), quantity, menuItem.getPrice());
+            PdfPCell menuItemDetailsCellLeft = new PdfPCell(new Phrase(menuItemDetails, regularFont));
+            menuItemDetailsCellLeft.setBorder(Rectangle.NO_BORDER);
+            menuItemDetailsCellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            PdfPCell menuItemAmountCellRight = new PdfPCell(new Phrase(String.format(ReceiptConstant.RECEIPT_AMOUNT_ROUNDING, itemSum), regularFont));
+            menuItemAmountCellRight.setBorder(Rectangle.NO_BORDER);
+            menuItemAmountCellRight.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            menuItemAmountCellRight.setVerticalAlignment(Element.ALIGN_BOTTOM);
+
+            menuItemTable.addCell(menuItemDetailsCellLeft);
+            menuItemTable.addCell(menuItemAmountCellRight);
+        }
+        return menuItemTable;
+    }
+
+    private void addReceiptBasicData(int currentReceiptNumber, Document rootDocument, Font titleFont, Font regularFont) {
+        // Tytuł dokumentu
+        Paragraph docType = new Paragraph("PARAGON FISKALNY\n", titleFont);
+        docType.setAlignment(Element.ALIGN_CENTER);
+        rootDocument.add(docType);
+
+        Paragraph docNum = new Paragraph("Numer dokumentu: " + currentReceiptNumber + "\n", regularFont);
+        docNum.setAlignment(Element.ALIGN_LEFT);
+        rootDocument.add(docNum);
+
+        rootDocument.add(new Paragraph(ReceiptConstant.RECEIPT_HORIZONTAL_LINE, regularFont));
+    }
+
+    private void addCompanyData(Document document, Font regularFont) {
+        // Dane firmy
+        Paragraph header = new Paragraph();
+        header.setAlignment(Element.ALIGN_CENTER);
+        header.add(new Chunk("Bar Mateusz & Bartek\n", regularFont));
+        header.add(new Chunk("Komputerowa 5 version 4.0\n", regularFont));
+        header.add(new Chunk("95-100 Zgierz\n", regularFont));
+        header.add(new Chunk("NIP 1234567890\n", regularFont));
+        header.add(new Chunk("REGON 987654321\n\n", regularFont));
+        document.add(header);
+    }
+
+    private File getReceiptPdfFile(int currentReceiptNumber) {
+        String currentMonthFolder = LocalDate.now().format(DateTimeFormatter.ofPattern(ReceiptConstant.RECEIPT_FOLDER_PATTERN));
+        File directory = new File(ReceiptConstant.RECEIPTS_ROOTNAME_FOLDER + currentMonthFolder);
+        if (!directory.exists()) {
+            directory.mkdirs(); // Tworzy foldery, jeśli nie istnieją
+        }
+        String receiptFileName = ReceiptConstant.RECEIPT_FILE_NAME + currentReceiptNumber + ReceiptConstant.RECEIPT_FILE_EXTENSION;
+        File receiptPdfFile = new File(directory, receiptFileName);
+        return receiptPdfFile;
+    }
+
     // Pomocnicza metoda do zapisu licznika i sprawdzania nowego miesiąca
     private int getAndUpdateReceiptCounter() {
         Properties props = new Properties();
         int counter = 1;
-        String currentYearAndMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String currentYearAndMonth = LocalDate.now().format(DateTimeFormatter.ofPattern(ReceiptConstant.RECEIPT_FOLDER_PATTERN));
         String savedYearAndMonth = "";
 
-        if (new File(CONFIG_FILE).exists()) {
-            try (InputStream input = new FileInputStream(CONFIG_FILE)) {
+        if (new File(ReceiptConstant.CONFIG_FILE).exists()) {
+            try (InputStream input = new FileInputStream(ReceiptConstant.CONFIG_FILE)) {
                 props.load(input);
-                savedYearAndMonth = props.getProperty("lastMonth", "");
+                savedYearAndMonth = props.getProperty(ReceiptConstant.LAST_MONTH_CONFIG_KEY, "");
                 if (currentYearAndMonth.equals(savedYearAndMonth)) {
-                    counter = Integer.parseInt(props.getProperty("counter", "1"));
+                    counter = Integer.parseInt(props.getProperty(ReceiptConstant.COUNTER_CONFIG_KEY, "1"));
                 }
             } catch (IOException | NumberFormatException e) {
                 e.printStackTrace();
             }
         }
 
-        try (OutputStream output = new FileOutputStream(CONFIG_FILE)) {
-            props.setProperty("counter", String.valueOf(counter + 1));
+        try (OutputStream output = new FileOutputStream(ReceiptConstant.CONFIG_FILE)) {
+            props.setProperty(ReceiptConstant.COUNTER_CONFIG_KEY, String.valueOf(counter + 1));
             if (!savedYearAndMonth.equals(currentYearAndMonth)) {
-                props.setProperty("lastMonth", currentYearAndMonth);
+                props.setProperty(ReceiptConstant.LAST_MONTH_CONFIG_KEY, currentYearAndMonth);
             }
             props.store(output, null);
         } catch (IOException e) {
