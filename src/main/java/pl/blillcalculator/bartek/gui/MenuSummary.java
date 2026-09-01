@@ -10,11 +10,14 @@ import java.util.Map;
 public class MenuSummary extends JFrame {
 
     private final double tipPercentage;
+    private final JTextField billTextField;
     private double total = 0;
     private PdfService pdfService = new PdfService();
 
-    public MenuSummary(Map<MenuItem, Integer> choosenDinners, double tipPercentage) {
+//     todo dołożyć dwa parametry z kwota napiwku i kwota razem
+    public MenuSummary(Map<MenuItem, Integer> choosenDinners, double tipPercentage, JTextField billTextField) {
         this.tipPercentage = tipPercentage;
+        this.billTextField = billTextField;
 
         initFrame();
         JTextArea orderSummaryTextArea = getOrderSummary(choosenDinners);
@@ -31,6 +34,13 @@ public class MenuSummary extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
         add(bottomContainer, BorderLayout.SOUTH);
 
+    }
+    public void dispose (boolean clearBillData) {
+//        TODO wyczyścić pozostałę pola z głównego okna, czyli kwaota napiwku i kwota razem (Bo ta pierwsza juz znika)
+        if(clearBillData){
+            billTextField.setText("");
+        }
+        super.dispose();
     }
 
     private JPanel getButtonPanel(Map<MenuItem, Integer> choosenDinners) {
@@ -51,10 +61,13 @@ public class MenuSummary extends JFrame {
 
         // Akcja dla paragonu
         printReceiptButton.addActionListener(e -> {
-            pdfService.generateReceiptPDF(choosenDinners, tipPercentage, total);
-            printReceiptButton.setEnabled(false);
-            printInvoiceButton.setEnabled(false);
-            cancelButton.setText("Zamknij");
+            boolean isGenerated = pdfService.generateReceiptPDF(choosenDinners, tipPercentage, total);
+            if (isGenerated) {
+                choosenDinners.clear();
+                dispose(true);
+                return;
+            }
+
             JOptionPane.showMessageDialog(this,
                     "Transakcja dokonana! Paragon został wykreowany i wydrukowany.",
                     "Status transakcji",

@@ -20,4 +20,9 @@ public class ReceiptConstant {
     public static final String RECEIPT_CODE_DATE_PATTERN = "yyyyMMddHHmmss";
     public static final String LAST_MONTH_CONFIG_KEY = "lastMonth";
     public static final String COUNTER_CONFIG_KEY = "counter";
+    public static final String COMPANY_NAME_CONFIG_KEY = "company.name";
+    public static final String COMPANY_STREET_CONFIG_KEY = "company.street";
+    public static final String COMPANY_CITY_CONFIG_KEY = "company.city";
+    public static final String COMPANY_NIP_CONFIG_KEY = "company.nip";
+    public static final String COMPANY_REGON_CONFIG_KEY = "company.regon";
 }

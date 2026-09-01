@@ -18,23 +18,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Properties;
 
+import static pl.blillcalculator.bartek.service.ReceiptConstant.*;
 
-//         todo 1 Dane firmy mają być na paragonie z pliku - receipt_config.properties
-//          todo 6 - po wygenerowaniu paragonu - czyścic zamówienie i zamykać okno z podsumowaniem (tak, aby nie można było wygenerować
-//           jeszcze raz paragonu ze zmienionym zamówieniem - Na końcu zrobić)
 public class PdfService {
 
 
-    // Główna metoda - usunęliśmy 'int receiptCounter' z parametrów!
-    public void generateReceiptPDF(Map<MenuItem, Integer> choosenDinners, double tipPercentage, double total) {
+//     Główna metoda - usunęliśmy 'int receiptCounter' z parametrów!
+    public boolean generateReceiptPDF(Map<MenuItem, Integer> choosenDinners, double tipPercentage, double total) {
 
         // 1. Pobranie unikalnego numeru paragonu dla bieżącego miesiąca
         int currentReceiptNumber = getAndUpdateReceiptCounter();
 
         // 2. Przygotowanie dynamicznej ścieżki do folderu (np. receipts/2026-07) - KROK 6
         File receiptPdfFile = getReceiptPdfFile(currentReceiptNumber);
-
-        int calculatedHeight = ReceiptConstant.RECEIPT_BASE_HEIGHT + (choosenDinners.size() * ReceiptConstant.RECEIPT_ITEM_HEIGHT);
+// TODO - dlaczego w niektórych przypadkach paragon jest rozciągany na dwie strony - poprawić, bo ma byc na jednej stronie w sensie bez przerwy drukowany.
+         int calculatedHeight = ReceiptConstant.RECEIPT_BASE_HEIGHT + (choosenDinners.size() * ReceiptConstant.RECEIPT_ITEM_HEIGHT);
         // Zabezpieczenie: minimalna wysokość to 300, żeby krótki paragon nie wyglądał dziwnie
         calculatedHeight = Math.max(calculatedHeight, ReceiptConstant.RECEIPT_MIN_HEIGHT);
         // Ustawienie szerokości na 150 i dynamicznej wysokości
@@ -64,9 +62,10 @@ public class PdfService {
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Błąd podczas generowania PDF: " + ex.getMessage(), "Błąd", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
+        return true;
     }
-
     private void openReceipt(File receiptPdfFile) throws IOException {
         // KROK 5: Automatyczne otwieranie pliku PDF po wygenerowaniu
         if (Desktop.isDesktopSupported()) {
@@ -75,7 +74,6 @@ public class PdfService {
             JOptionPane.showMessageDialog(null, "Wygenerowano: " + receiptPdfFile.getAbsolutePath());
         }
     }
-
     private void addReceiptFooter(int currentReceiptNumber, Document rootDocument, Font regularFont) {
         // Data i dokładny czas transakcji (sekundy)
         LocalDateTime now = LocalDateTime.now();
@@ -170,18 +168,6 @@ public class PdfService {
         rootDocument.add(new Paragraph(ReceiptConstant.RECEIPT_HORIZONTAL_LINE, regularFont));
     }
 
-    private void addCompanyData(Document document, Font regularFont) {
-        // Dane firmy
-        Paragraph header = new Paragraph();
-        header.setAlignment(Element.ALIGN_CENTER);
-        header.add(new Chunk("Bar Mateusz & Bartek\n", regularFont));
-        header.add(new Chunk("Komputerowa 5 version 4.0\n", regularFont));
-        header.add(new Chunk("95-100 Zgierz\n", regularFont));
-        header.add(new Chunk("NIP 1234567890\n", regularFont));
-        header.add(new Chunk("REGON 987654321\n\n", regularFont));
-        document.add(header);
-    }
-
     private File getReceiptPdfFile(int currentReceiptNumber) {
         String currentMonthFolder = LocalDate.now().format(DateTimeFormatter.ofPattern(ReceiptConstant.RECEIPT_FOLDER_PATTERN));
         File directory = new File(ReceiptConstant.RECEIPTS_ROOTNAME_FOLDER + currentMonthFolder);
@@ -224,7 +210,35 @@ public class PdfService {
 
         return counter;
     }
+    private void addCompanyData(Document rootDocument, Font regularFont) throws DocumentException {
+        Properties properties = new Properties();
+        if (new File(ReceiptConstant.CONFIG_FILE).exists()) {
+            try (InputStream input = new FileInputStream(ReceiptConstant.CONFIG_FILE)) {
+                properties.load(input);
+                String name = properties.getProperty(COMPANY_NAME_CONFIG_KEY, null);
+                String street = properties.getProperty(COMPANY_STREET_CONFIG_KEY, null);
+                String city = properties.getProperty(COMPANY_CITY_CONFIG_KEY, null);
+                String nip = properties.getProperty(COMPANY_NIP_CONFIG_KEY, null);
+                String regon = properties.getProperty(COMPANY_REGON_CONFIG_KEY, null);
+                if (name == null || street == null || city == null || nip == null || regon == null) {
+                    JOptionPane.showMessageDialog(null, "Błąd generowania paragonu, brak danych firmy.",
+                                                                            "Błąd!", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                Paragraph companyParagraph = new Paragraph();
+                companyParagraph.setAlignment(Element.ALIGN_CENTER);
+                companyParagraph.add(new Chunk(name + "\n", regularFont));
+                companyParagraph.add(new Chunk(street + "\n", regularFont));
+                companyParagraph.add(new Chunk(city + "\n", regularFont));
+                companyParagraph.add(new Chunk(nip + "\n", regularFont));
+                companyParagraph.add(new Chunk(regon + "\n", regularFont));
+                rootDocument.add(companyParagraph);
 
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     private void addSummaryRow(PdfPTable table, String label, String value, Font font) {
         PdfPCell cellLbl = new PdfPCell(new Phrase(label, font));
         cellLbl.setBorder(Rectangle.NO_BORDER);
