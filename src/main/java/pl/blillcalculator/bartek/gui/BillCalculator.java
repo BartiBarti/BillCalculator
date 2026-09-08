@@ -135,8 +135,7 @@ public class BillCalculator extends JFrame {
 
         String selectedTipText = tipPercentComboBox.getSelectedItem().toString();
         double tipPercent = Double.parseDouble(selectedTipText.replace("%", "").trim());
-//         todo dodać w Menu Summary dwa parametry (tak jak przy tym znikającym pierwszym)
-        new MenuSummary(choosenDinners, tipPercent, billTextField).setVisible(true);
+        new MenuSummary(choosenDinners, tipPercent, billTextField, tipTextField, billSumTextField).setVisible(true);
     }
 
     private Menu openOrRestoreMenu(Menu menu, MenuType type) {

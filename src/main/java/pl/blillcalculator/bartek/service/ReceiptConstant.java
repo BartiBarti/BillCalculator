@@ -2,10 +2,7 @@ package pl.blillcalculator.bartek.service;
 
 public class ReceiptConstant {
 
-    private ReceiptConstant() {
-    }
-
-    public static final int RECEIPT_BASE_HEIGHT = 250;
+    public static final int RECEIPT_BASE_HEIGHT = 300;
     public static final int RECEIPT_ITEM_HEIGHT = 25;
     public static final String CONFIG_FILE = "src/main/resources/receipt_config.properties";
     public static final String RECEIPT_FOLDER_PATTERN = "yyyy-MM";
@@ -25,4 +22,6 @@ public class ReceiptConstant {
     public static final String COMPANY_CITY_CONFIG_KEY = "company.city";
     public static final String COMPANY_NIP_CONFIG_KEY = "company.nip";
     public static final String COMPANY_REGON_CONFIG_KEY = "company.regon";
+    private ReceiptConstant() {
+    }
 }

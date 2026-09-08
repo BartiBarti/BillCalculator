@@ -11,13 +11,16 @@ public class MenuSummary extends JFrame {
 
     private final double tipPercentage;
     private final JTextField billTextField;
+    private final JTextField tipTextField;
+    private final JTextField billSumTextField;
     private double total = 0;
     private PdfService pdfService = new PdfService();
 
-//     todo dołożyć dwa parametry z kwota napiwku i kwota razem
-    public MenuSummary(Map<MenuItem, Integer> choosenDinners, double tipPercentage, JTextField billTextField) {
+    public MenuSummary(Map<MenuItem, Integer> choosenDinners, double tipPercentage, JTextField billTextField, JTextField tipTextField, JTextField billSumTextField) {
         this.tipPercentage = tipPercentage;
         this.billTextField = billTextField;
+        this.tipTextField = tipTextField;
+        this.billSumTextField = billSumTextField;
 
         initFrame();
         JTextArea orderSummaryTextArea = getOrderSummary(choosenDinners);
@@ -35,10 +38,12 @@ public class MenuSummary extends JFrame {
         add(bottomContainer, BorderLayout.SOUTH);
 
     }
-    public void dispose (boolean clearBillData) {
-//        TODO wyczyścić pozostałę pola z głównego okna, czyli kwaota napiwku i kwota razem (Bo ta pierwsza juz znika)
-        if(clearBillData){
+
+    public void dispose(boolean clearBillData) {
+        if (clearBillData) {
             billTextField.setText("");
+            tipTextField.setText("");
+            billSumTextField.setText("");
         }
         super.dispose();
     }
