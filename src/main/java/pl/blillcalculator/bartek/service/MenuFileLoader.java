@@ -41,9 +41,6 @@ public class MenuFileLoader {
                     menuContentTextArea.getText()
             );
 
-            JOptionPane.showMessageDialog(null, "Zmodyfikowano plik Menu: " +
-                    menuType.getTitle());
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -60,4 +57,57 @@ public class MenuFileLoader {
         }
     }
 
+    // Nowa metoda serwisu odpowiedzialna za pełną walidację tekstu z pola edycji
+    public String validateMenuContent(String content) {
+        String[] lines = content.split("\\n");
+        StringBuilder allErrors = new StringBuilder();
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+            List<String> lineErrors = new ArrayList<>();
+
+            if (line.isEmpty()) {
+                allErrors.append("Linia ").append(i + 1).append(": Podana linia jest pusta. Wymagany format: NazwaDania;Cena;Dostępność\n");
+                continue;
+            }
+
+            String[] parts = line.split(";");
+            if (parts.length != 3) {
+                allErrors.append("Linia ").append(i + 1).append(": Niepoprawna struktura. Wymagany format: NazwaDania;Cena;Dostępność\n");
+                continue;
+            }
+
+            String name = parts[0].trim();
+            String priceStr = parts[1].trim();
+            String availabilityStr = parts[2].trim();
+
+            //  Zamiast przerywać na pierwszym błędzie, sprawdzamy wszystkie warunki dla danej linii
+            if (name.isEmpty()) {
+                lineErrors.add("nazwa dania nie może być pusta");
+            }
+
+            try {
+                double price = Double.parseDouble(priceStr);
+                if (price <= 0) {
+                    lineErrors.add("cena musi być większa od 0");
+                }
+            } catch (NumberFormatException e) {
+                lineErrors.add("cena musi być poprawną liczbą (np. 15.50)");
+            }
+
+            if (!availabilityStr.equals("0") && !availabilityStr.equals("1") && !availabilityStr.equals("2")) {
+                lineErrors.add("dostępność musi mieć wartość 0, 1 lub 2");
+            }
+
+            // Jeśli ta linia miała jakieś błędy, łączymy je w jeden ładny komunikat
+            if (!lineErrors.isEmpty()) {
+                allErrors.append("Linia ").append(i + 1).append(": ")
+                        .append(String.join(", ", lineErrors))
+                        .append(".\n");
+            }
+        }
+
+        return allErrors.toString();
+    }
 }
+
