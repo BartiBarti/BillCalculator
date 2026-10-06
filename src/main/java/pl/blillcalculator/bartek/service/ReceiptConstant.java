@@ -22,6 +22,7 @@ public class ReceiptConstant {
     public static final String COMPANY_CITY_CONFIG_KEY = "company.city";
     public static final String COMPANY_NIP_CONFIG_KEY = "company.nip";
     public static final String COMPANY_REGON_CONFIG_KEY = "company.regon";
+
     private ReceiptConstant() {
     }
 }
