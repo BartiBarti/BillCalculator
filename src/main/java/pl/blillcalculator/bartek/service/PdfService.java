@@ -241,6 +241,21 @@ public class PdfService {
             }
         }
     }
+// todo - po przeniesieniu logiki z PrintMenu do PdfServis zmienic metodę - GetRestaurantName na Prywatną i nieStatyczną
+    public static String getRestaurantName() {
+        Properties properties = new Properties();
+        File configFile = new File(ReceiptConstant.CONFIG_FILE);
+
+        if (configFile.exists()) {
+            try (InputStream input = new FileInputStream(configFile)) {
+                properties.load(input);
+                return properties.getProperty(COMPANY_NAME_CONFIG_KEY, "NASZA RESTAURACJA");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return "NASZA RESTAURACJA"; // Wartość domyślna, gdyby brakowało pliku
+    }
 
     private void addSummaryRow(PdfPTable table, String label, String value, Font font) {
         PdfPCell cellLbl = new PdfPCell(new Phrase(label, font));
