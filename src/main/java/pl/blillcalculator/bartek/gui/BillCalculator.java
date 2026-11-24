@@ -3,7 +3,7 @@ package pl.blillcalculator.bartek.gui;
 import pl.blillcalculator.bartek.model.MenuItem;
 import pl.blillcalculator.bartek.model.MenuType;
 import pl.blillcalculator.bartek.service.BillService;
-import pl.blillcalculator.bartek.service.PrintMenu;
+import pl.blillcalculator.bartek.service.PdfService;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -51,7 +51,10 @@ public class BillCalculator extends JFrame {
 
     private BillService billService;
 
-    private final PrintMenu printMenuService = new PrintMenu();
+//    private final PrintMenu printMenuService = new PrintMenu();
+
+    private final PdfService pdfService = new PdfService();
+
 
 
     public BillCalculator() {
@@ -68,7 +71,7 @@ public class BillCalculator extends JFrame {
         setTextFieldEditability();
         menuActionListeners();
 
-        printMenuButton.addActionListener(e -> printMenuService.printWholeMenu());
+        printMenuButton.addActionListener(e -> pdfService.generateMenuPdf());
 
         editMenuButton.addActionListener(e -> {
             new EditMenu().setVisible(true);

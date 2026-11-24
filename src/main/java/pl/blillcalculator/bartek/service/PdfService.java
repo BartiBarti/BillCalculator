@@ -7,14 +7,19 @@ import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import com.lowagie.text.pdf.draw.DottedLineSeparator;
 import pl.blillcalculator.bartek.model.MenuItem;
+import pl.blillcalculator.bartek.model.MenuType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -22,6 +27,43 @@ import static pl.blillcalculator.bartek.service.ReceiptConstant.*;
 
 public class PdfService {
 
+    public void generateMenuPdf() {
+        try {
+            // 1. Utworzenie pliku tymczasowego (skasuje się po zamknięciu aplikacji)
+            Path tempFilePath = Files.createTempFile("menu-restauracji-", ".pdf");
+            File menuPdfFile = tempFilePath.toFile();
+            menuPdfFile.deleteOnExit(); // <-- Flaga zapewniająca kasowanie pliku tymczasowego
+
+            // 2. Utworzenie dokumentu PDF w formacie A4
+            Document rootDocument = new Document(PageSize.A4, 40, 40, 40, 40);
+            PdfWriter.getInstance(rootDocument, new FileOutputStream(menuPdfFile));
+            rootDocument.open();
+
+            // Przygotowanie czcionek z obsługą polskich znaków (wzorowane na paragonie)
+            BaseFont baseFont = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1250, BaseFont.EMBEDDED);
+            Font sectionFont = new Font(baseFont, 14, Font.BOLD);
+            Font regularFont = new Font(baseFont, 12, Font.NORMAL);
+
+            addMenuHeader(rootDocument, baseFont);
+
+            MenuFileLoader menuLoader = new MenuFileLoader();
+
+            // 3. Pętla przechodząca przez WSZYSTKIE pliki menu (kategorie) po kolei
+            for (MenuType type : MenuType.values()) {
+                List<MenuItem> categoryItems = menuLoader.loadMenuFromFile(type.getFilePath());
+                addMenuCategorySection(rootDocument, type, categoryItems, sectionFont, regularFont);
+            }
+
+            rootDocument.close();
+
+            // 4. Automatyczne otwarcie pliku w systemie (od razu, bez dodatkowych okien) [1]
+            openPdfFile(menuPdfFile);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Błąd podczas generowania menu PDF: " + ex.getMessage(), "Błąd", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     //     Główna metoda - usunęliśmy 'int receiptCounter' z parametrów!
     public boolean generateReceiptPDF(Map<MenuItem, Integer> choosenDinners, double tipPercentage, double total) {
@@ -56,7 +98,7 @@ public class PdfService {
             addReceiptFooter(currentReceiptNumber, rootDocument, regularFont);
             rootDocument.close();
 
-            openReceipt(receiptPdfFile);
+            openPdfFile(receiptPdfFile);
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -66,7 +108,7 @@ public class PdfService {
         return true;
     }
 
-    private void openReceipt(File receiptPdfFile) throws IOException {
+    private void openPdfFile(File receiptPdfFile) throws IOException {
         // KROK 5: Automatyczne otwieranie pliku PDF po wygenerowaniu
         if (Desktop.isDesktopSupported()) {
             Desktop.getDesktop().open(receiptPdfFile);
@@ -241,8 +283,8 @@ public class PdfService {
             }
         }
     }
-// todo - po przeniesieniu logiki z PrintMenu do PdfServis zmienic metodę - GetRestaurantName na Prywatną i nieStatyczną
-    public static String getRestaurantName() {
+
+    private String getRestaurantName() {
         Properties properties = new Properties();
         File configFile = new File(ReceiptConstant.CONFIG_FILE);
 
@@ -269,4 +311,62 @@ public class PdfService {
         table.addCell(cellLbl);
         table.addCell(cellVal);
     }
+
+    private void addMenuHeader(Document rootDocument, BaseFont baseFont) throws DocumentException {
+        Font titleFont = new Font(baseFont, 22, Font.BOLD);
+        Font subTitleFont = new Font(baseFont, 16, Font.BOLD);
+
+        String restaurantName = getRestaurantName();
+        Paragraph mainTitle = new Paragraph(restaurantName + "\n", titleFont);
+        mainTitle.setAlignment(Element.ALIGN_CENTER);
+        rootDocument.add(mainTitle);
+
+        Paragraph subTitle = new Paragraph("MENU RESTAURACJI\n", subTitleFont);
+        subTitle.setAlignment(Element.ALIGN_CENTER);
+        rootDocument.add(subTitle);
+    }
+
+    private void addMenuCategorySection(Document rootDocument, MenuType type, List<MenuItem> categoryItems, Font sectionFont, Font regularFont) throws DocumentException {
+        // Sprawdzamy, czy w tej kategorii są jakiekolwiek dostępne pozycje
+        boolean hasAvailableItems = false;
+        for (MenuItem item : categoryItems) {
+            if (item.getAvailability() != 0) {
+                hasAvailableItems = true;
+                break;
+            }
+        }
+
+        // Jeśli kategoria ma dostępne dania, budujemy dla niej sekcję
+        if (hasAvailableItems) {
+            Paragraph categoryHeader = new Paragraph(type.getTitle().toUpperCase() + "\n", sectionFont);
+            categoryHeader.setAlignment(Element.ALIGN_LEFT);
+            rootDocument.add(categoryHeader);
+            rootDocument.add(new Paragraph("-------------", regularFont));
+
+            DottedLineSeparator dottedLine = new DottedLineSeparator();
+            dottedLine.setGap(4f);
+            dottedLine.setLineWidth(1f);
+
+            for (MenuItem item : categoryItems) {
+                if (item.getAvailability() != 0) {
+                    String formattedPrice = String.format("%.2f PLN", item.getPrice());
+
+                    Paragraph itemLine = new Paragraph();
+                    itemLine.setFont(regularFont);
+                    itemLine.add(new Chunk(item.getName() + " ", regularFont));
+                    itemLine.add(new Chunk(dottedLine));
+                    itemLine.add(new Chunk(" " + formattedPrice, regularFont));
+                    itemLine.setSpacingAfter(4f);
+
+                    rootDocument.add(itemLine);
+                }
+            }
+
+            // Odstęp po całej sekcji
+            Paragraph sectionSpacer = new Paragraph("\n", regularFont);
+            sectionSpacer.setSpacingAfter(5f);
+            rootDocument.add(sectionSpacer);
+        }
+    }
+
 }
